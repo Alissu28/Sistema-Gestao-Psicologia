@@ -1,0 +1,559 @@
+<style>
+  /* DESIGN PREMIUM E RESET DE TELA CHEIA PARA PRONTUÁRIOS */
+  .prontuario-container-premium {
+    padding: 24px !important;
+    background-color: #f8fafc !important;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    animation: prontuarioFadeIn 0.25s ease-out;
+  }
+  
+  .prontuario-card-premium { 
+    background: white !important; 
+    border-radius: 16px !important; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02) !important; 
+    padding: 32px !important; 
+    border: 1px solid #e2e8f0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .prontuario-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 100%;
+  }
+
+  /* REESTILIZAÇÃO DOS BOTÕES PRINCIPAIS */
+  .btn-prontuario-custom {
+    background: #8b5cf6 !important;
+    color: white !important;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    transition: all 0.2s ease;
+  }
+  .btn-prontuario-custom:hover {
+    background: #7c3aed !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+  }
+  
+  /* BARRAS DE FILTRAGEM */
+  .filter-box-premium {
+    margin-bottom: 24px; 
+    background: #f8fafc; 
+    padding: 20px; 
+    border-radius: 12px; 
+    border: 1px solid #e2e8f0; 
+    display: flex; 
+    align-items: center; 
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* BOTÕES DE AÇÃO INTERNOS DA TABELA */
+  .btn-action-round {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  .btn-action-round.view { background: #f0fdfa; color: #0d9488; border: 1px solid rgba(13, 148, 136, 0.15); }
+  .btn-action-round.view:hover { background: #0d9488; color: white; }
+  .btn-action-round.edit { background: #eff6ff; color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.15); }
+  .btn-action-round.edit:hover { background: #2563eb; color: white; }
+  .btn-action-round.delete { background: #fef2f2; color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.15); }
+  .btn-action-round.delete:hover { background: #dc2626; color: white; }
+  .btn-action-round:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; border: none; }
+
+  /* TABELA CLÍNICA */
+  .table-responsive-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+  .prontuario-table-premium { 
+    width: 100%; 
+    border-collapse: collapse; 
+    background: white;
+  }
+  .prontuario-table-premium th { 
+    background: #f8fafc; 
+    color: #64748b; 
+    font-size: 11px; 
+    font-weight: 700;
+    text-transform: uppercase; 
+    padding: 14px 18px; 
+    text-align: left; 
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .prontuario-table-premium td { 
+    padding: 16px 18px; 
+    border-bottom: 1px solid #f1f5f9; 
+    vertical-align: middle; 
+  }
+  .prontuario-table-premium tr:last-child td { border-bottom: none; }
+  .prontuario-table-premium tr:hover td { background-color: #fafafa; }
+  
+  /* COMPONENTES DE ENTRADA (INPUTS, SELECTS E TEXTAREAS) */
+  .input-field-prontuario { 
+    padding: 10px 12px; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 8px; 
+    font-size: 13px; 
+    color: #334155;
+    background-color: #fff;
+    transition: all 0.2s;
+    font-weight: 500;
+    box-sizing: border-box !important;
+  }
+  .input-field-prontuario:focus { 
+    border-color: #8b5cf6; 
+    outline: none; 
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); 
+  }
+  .select-patient-secure {
+    min-width: 280px !important;
+    padding-right: 28px !important;
+    cursor: pointer;
+  }
+
+  /* MODAL DE EVOLUÇÕES PREMIUM */
+  .modal-overlay-secure {
+    display: none;
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(15, 23, 42, 0.4); 
+    backdrop-filter: blur(4px);
+    z-index: 9999; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .modal-box-premium {
+    background: white;
+    width: 100%; 
+    max-width: 750px; 
+    border-radius: 16px; 
+    padding: 32px; 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); 
+    position: relative; 
+    max-height: 88vh;
+    overflow-y: auto;
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+  }
+
+  /* CHIPS COGNITIVOS / BADGES */
+  .badge-clinical {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .badge-clinical.date { background: #f1f5f9; color: #475569; }
+  .badge-clinical.theme { background: #f5f3ff; color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.1); }
+
+  @keyframes prontuarioFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+/**
+ * PONTO DE ENTRADA DO MENU - EXIBE A TELA DE PRONTUÁRIOS
+ */
+function abrirTelaProntuarios() {
+  const main = document.getElementById("main");
+  if (!main) return;
+
+  main.innerHTML = `
+    <div class="prontuario-container-premium">
+      <div class="prontuario-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 50px; height: 50px; background-color: #f5f3ff; color: #8b5cf6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid rgba(139, 92, 246, 0.15);">
+            <i class="fa-solid fa-book-medical"></i>
+          </div>
+          <div>
+            <h2 style="color: #0f172a; font-weight: 800; margin: 0; font-size: 24px; letter-spacing: -0.5px;">Evoluções e Prontuários</h2>
+            <p style="color: #64748b; font-size: 14px; margin: 4px 0 0 0; font-weight: 500;">Histórico de registros clínicos e acompanhamento terapêutico</p>
+          </div>
+        </div>
+        <button class="btn-prontuario-custom" onclick="prepararNovoRegistro()">
+          <i class="fa-solid fa-notes-medical"></i> Nova Evolução
+        </button>
+      </div>
+
+      <div class="prontuario-card-premium">
+        <div class="filter-box-premium">
+          <label style="font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-filter" style="color: #8b5cf6;"></i> Selecionar Paciente:
+          </label>
+          <select id="pr_paciente_filtro" onchange="carregarTabelaHistorico()" class="input-field-prontuario select-patient-secure">
+            <option value="">Carregando lista de pacientes...</option>
+          </select>
+        </div>
+
+        <div class="table-responsive-wrapper">
+          <table class="prontuario-table-premium">
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Data da Sessão</th>
+                <th style="text-align: center; width: 80px;">Visualizar</th>
+                <th style="text-align: right; padding-right: 24px; width: 120px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="corpo_tabela_prontuario">
+              <tr>
+                <td colspan="4" style="padding: 60px 0; text-align: center; color: #94a3b8; font-weight: 500;">
+                  <i class="fa-solid fa-user-check" style="font-size: 28px; color: #cbd5e1; margin-bottom: 12px; display: block;"></i>
+                  Por favor, filtre por um paciente ativo para carregar o histórico de prontuários.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal_prontuario" class="modal-overlay-secure" onclick="fecharModalProntuarioExterno(event)">
+       <div id="modal_conteudo" class="modal-box-premium"></div>
+    </div>
+  `;
+
+  popularSelectPacientes();
+}
+
+/**
+ * FECHA MODAL QUANDO CLICA FORA DA CAIXA
+ */
+function fecharModalProntuarioExterno(e) {
+  if(e.target.id === "modal_prontuario") {
+    document.getElementById('modal_prontuario').style.display='none';
+  }
+}
+
+/**
+ * POPULAR SELECT DE PACIENTES COM BANCO DE DADOS
+ */
+function popularSelectPacientes() {
+  google.script.run
+    .withSuccessHandler(function(lista) {
+      let select = document.getElementById("pr_paciente_filtro");
+      if(!select) return;
+      let html = '<option value="">Busque ou selecione um paciente...</option>';
+      lista.forEach(pac => html += `<option value="${pac[1]}">👤 ${pac[1].toString().toUpperCase()}</option>`);
+      select.innerHTML = html;
+    })
+    .listarPacientes();
+}
+
+/**
+ * CARREGAR HISTÓRICO CLÍNICO DO PACIENTE SELECIONADO
+ */
+function carregarTabelaHistorico() {
+  const pac = document.getElementById("pr_paciente_filtro").value;
+  const corpo = document.getElementById("corpo_tabela_prontuario");
+
+  if (!pac) {
+    corpo.innerHTML = `
+      <tr>
+        <td colspan="4" style="padding: 60px 0; text-align: center; color: #94a3b8; font-weight: 500;">
+          <i class="fa-solid fa-user-check" style="font-size: 28px; color: #cbd5e1; margin-bottom: 12px; display: block;"></i>
+          Por favor, filtre por um paciente ativo para carregar o histórico de prontuários.
+        </td>
+      </tr>`;
+    return;
+  }
+
+  corpo.innerHTML = `
+    <tr>
+      <td colspan="4" style="text-align:center; padding: 40px; color: #64748b; font-weight: 500;">
+        <i class="fa-solid fa-circle-notch fa-spin" style="color: #8b5cf6; font-size: 20px; margin-bottom: 8px;"></i><br>
+        Recuperando prontuários de histórico...
+      </td>
+    </tr>`;
+
+  google.script.run
+    .withSuccessHandler(function(historico) {
+      let html = "";
+      if (historico && historico.length > 0) {
+        historico.forEach((h) => {
+          html += `
+          <tr>
+            <td>
+              <div style="font-weight: 700; color: #0f172a; font-size: 14px;">${pac.toUpperCase()}</div>
+              <div style="font-size: 12px; color: #7c3aed; font-weight: 600; margin-top: 2px;">
+                <i class="fa-solid fa-hashtag" style="font-size:10px; margin-right:3px;"></i>${h.tema || 'Evolução de Rotina'}
+              </div>
+            </td>
+            <td style="font-weight: 600; color: #475569; font-size: 13px;">
+              <i class="fa-regular fa-calendar" style="margin-right: 6px; color: #94a3b8;"></i>${h.data}
+            </td>
+            <td style="text-align: center;">
+              <button class="btn-action-round view" onclick='abrirVisualizacao(${JSON.stringify(h)}, "${pac.replace(/"/g, '&quot;')}")' title="Ler Evolução Completa">
+                <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+            </td>
+            <td style="text-align: right; padding-right:24px;">
+              <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn-action-round edit" onclick='prepararEdicao(${JSON.stringify(h)})' title="Editar Registro">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-action-round delete" onclick="confirmarExclusao('${h.id}', '${h.data}')" title="Excluir Registro">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>`;
+        });
+      } else {
+        html = `
+          <tr>
+            <td colspan="4" style="text-align:center; padding: 50px; color:#94a3b8; font-weight: 500;">
+              <i class="fa-solid fa-folder-open" style="font-size: 32px; color: #e2e8f0; margin-bottom: 12px; display: block;"></i>
+              Nenhum prontuário ou histórico clínico registrado para este paciente.
+            </td>
+          </tr>`;
+      }
+      corpo.innerHTML = html;
+    })
+    .buscarHistoricoProntuario(pac);
+}
+
+/**
+ * ABRE O MODAL COM O TEXTO DA EVOLUÇÃO (LEITURA CRÍTICA)
+ */
+function abrirVisualizacao(dados, nomePaciente) {
+  const modal = document.getElementById("modal_prontuario");
+  const conteudo = document.getElementById("modal_conteudo");
+
+  conteudo.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; border-bottom:1px solid #f1f5f9; padding-bottom:16px;">
+      <div>
+        <h3 style="margin:0; color:#0f172a; font-weight: 800; font-size: 18px;">Evolução Clínica</h3>
+        <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px; font-weight: 500;">Paciente: ${nomePaciente.toUpperCase()}</p>
+      </div>
+      <button onclick="document.getElementById('modal_prontuario').style.display='none'" style="background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8; transition:color 0.2s;" onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+    </div>
+    
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;">
+      <div class="badge-clinical date"><i class="fa-regular fa-calendar"></i> Sessão: ${dados.data}</div>
+      <div class="badge-clinical theme"><i class="fa-solid fa-bookmark"></i> Tema: ${dados.tema || 'Não informado'}</div>
+    </div>
+    
+    <div style="background:#f8fafc; padding:24px; border-radius:12px; border:1px solid #e2e8f0; line-height:1.6; color:#334155; font-size:14px; white-space:pre-wrap; min-height: 150px; font-weight: 500;">${dados.evolucao}</div>
+    
+    <div style="margin-top:24px; text-align:right;">
+      <button class="btn-prontuario-custom" style="background:#f1f5f9 !important; color:#475569 !important; box-shadow:none;" onclick="document.getElementById('modal_prontuario').style.display='none'">
+        Fechar Prontuário
+      </button>
+    </div>
+  `;
+  modal.style.display = "flex";
+}
+
+/**
+ * ABRE MODAL PARA CRIAR NOVO REGISTRO CLÍNICO
+ */
+function prepararNovoRegistro() {
+  const pac = document.getElementById("pr_paciente_filtro").value;
+  if (!pac) return alert("⚠️ Por favor, selecione um paciente no filtro principal antes de abrir uma nova evolução.");
+
+  const modal = document.getElementById("modal_prontuario");
+  const conteudo = document.getElementById("modal_conteudo");
+
+  conteudo.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; border-bottom:1px solid #f1f5f9; padding-bottom:16px;">
+      <div>
+        <h3 style="margin:0; color:#0f172a; font-weight: 800; font-size: 18px;"><i class="fa-solid fa-file-medical" style="color:#8b5cf6; margin-right:4px;"></i> Nova Anotação Clínica</h3>
+        <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px; font-weight: 500;">Registrando dados para: ${pac.toUpperCase()}</p>
+      </div>
+      <button onclick="document.getElementById('modal_prontuario').style.display='none'" style="background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:24px;">
+       <div style="display:flex; flex-direction:column; gap:6px;">
+         <label style="font-weight:700; font-size:11px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Tema Principal da Sessão</label>
+         <input type="text" id="novo_tema" class="input-field-prontuario" placeholder="Ex: Crise de ansiedade no trabalho, dinâmica familiar, etc.">
+       </div>
+       
+       <div style="display:flex; flex-direction:column; gap:6px;">
+         <label style="font-weight:700; font-size:11px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Evolução Clínica / Conduta Terapêutica</label>
+         <textarea id="novo_texto" class="input-field-prontuario" style="height:250px; resize:none; line-height:1.5; font-family:inherit;" placeholder="Digite aqui o relatório detalhado do atendimento clínico..."></textarea>
+       </div>
+    </div>
+    
+    <div style="display:flex; gap:12px; justify-content:flex-end;">
+       <button class="btn-prontuario-custom" style="background:#f1f5f9 !important; color:#475569 !important; box-shadow:none;" onclick="document.getElementById('modal_prontuario').style.display='none'">
+         Cancelar
+       </button>
+       <button class="btn-prontuario-custom" style="background:#10b981 !important; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" onclick="salvarNovoRegistro('${pac.replace(/"/g, '&quot;')}')" id="btnSalvarNovaEv">
+         <i class="fa-solid fa-floppy-disk"></i> Gravar Sessão
+       </button>
+    </div>
+  `;
+  modal.style.display = "flex";
+}
+
+function salvarNovoRegistro(paciente) {
+  const texto = document.getElementById("novo_texto").value.trim();
+  const tema = document.getElementById("novo_tema").value.trim();
+  const btn = document.getElementById("btnSalvarNovaEv");
+
+  if (!texto) return alert("⚠️ Erro: O texto da evolução clínica não pode ficar em branco.");
+
+  if(btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Gravando...";
+  }
+
+  google.script.run
+    .withSuccessHandler(() => {
+      document.getElementById('modal_prontuario').style.display='none';
+      carregarTabelaHistorico();
+      alert("✅ Registro clínico gravado com sucesso!");
+    })
+    .withFailureHandler((erro) => {
+      alert("❌ Falha técnica ao salvar: " + erro);
+      if(btn) { btn.disabled = false; btn.innerHTML = "<i class='fa-solid fa-floppy-disk'></i> Gravar Sessão"; }
+    })
+    .salvarEvolucao({ paciente: paciente, texto: texto, tema: tema });
+}
+
+/**
+ * PREPARA E ABRE O MODAL EM MODO EDIÇÃO
+ */
+function prepararEdicao(dados) {
+  const modal = document.getElementById("modal_prontuario");
+  const conteudo = document.getElementById("modal_conteudo");
+
+  conteudo.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; border-bottom:1px solid #f1f5f9; padding-bottom:16px;">
+      <div>
+        <h3 style="margin:0; color:#0f172a; font-weight: 800; font-size: 18px;"><i class="fa-solid fa-user-pen" style="color:#2563eb; margin-right:4px;"></i> Retificar Registro Clínico</h3>
+        <p style="margin: 4px 0 0 0; color: #64748b; font-size: 13px; font-weight: 500;">Histórico do dia: ${dados.data}</p>
+      </div>
+      <button onclick="document.getElementById('modal_prontuario').style.display='none'" style="background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+    </div>
+    
+    <input type="hidden" id="edit_id" value="${dados.id}">
+    
+    <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:24px;">
+       <div style="display:flex; flex-direction:column; gap:6px;">
+         <label style="font-weight:700; font-size:11px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Tema Principal</label>
+         <input type="text" id="edit_tema" class="input-field-prontuario" value="${dados.tema || ''}">
+       </div>
+       
+       <div style="display:flex; flex-direction:column; gap:6px;">
+         <label style="font-weight:700; font-size:11px; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Evolução Clínica</label>
+         <textarea id="edit_evolucao" class="input-field-prontuario" style="height:260px; resize:none; line-height:1.5; font-family:inherit;">${dados.evolucao}</textarea>
+       </div>
+    </div>
+    
+    <div style="display:flex; gap:12px; justify-content:flex-end;">
+       <button class="btn-prontuario-custom" style="background:#f1f5f9 !important; color:#475569 !important; box-shadow:none;" onclick="document.getElementById('modal_prontuario').style.display='none'">
+         Cancelar
+       </button>
+       <button class="btn-prontuario-custom" style="background:#2563eb !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);" onclick="salvarAlteracoes()" id="btnAtualizarEv">
+         <i class="fa-solid fa-arrows-rotate"></i> Atualizar Dados
+       </button>
+    </div>
+  `;
+  modal.style.display = "flex";
+}
+
+function salvarAlteracoes() {
+  const id = document.getElementById("edit_id").value;
+  const tema = document.getElementById("edit_tema").value.trim();
+  const evolucao = document.getElementById("edit_evolucao").value.trim();
+  const btn = document.getElementById("btnAtualizarEv");
+
+  if (!evolucao || !tema) {
+    return alert("⚠️ Atenção: Preencha obrigatoriamente tanto o Tema quanto a Evolução.");
+  }
+
+  if(btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Salvando...";
+  }
+
+  google.script.run
+    .withSuccessHandler((sucesso) => {
+      if (sucesso) {
+        document.getElementById('modal_prontuario').style.display = 'none';
+        alert("✅ Registro atualizado na planilha de base!");
+        carregarTabelaHistorico();
+      } else {
+        alert("❌ Erro operacional: Não foi possível localizar a ID do prontuário para edição.");
+        if(btn) { btn.disabled = false; btn.innerHTML = "<i class='fa-solid fa-arrows-rotate'></i> Atualizar Dados"; }
+      }
+    })
+    .withFailureHandler((erro) => {
+      alert("❌ Erro de barramento de rede técnico: " + erro);
+      if(btn) { btn.disabled = false; btn.innerHTML = "<i class='fa-solid fa-arrows-rotate'></i> Atualizar Dados"; }
+    })
+    .atualizarRegistroProntuario({id: id, tema: tema, evolucao: evolucao});
+}
+
+/**
+ * EXCLUSÃO LOGÍSTICA DE REGISTRO
+ */
+function confirmarExclusao(id, data) {
+  if (confirm(`⚠️ Você tem certeza absoluta que deseja remover permanentemente os registros da sessão de ${data}?\nEsta ação apagará a linha correspondente na planilha.`)) {
+    google.script.run
+      .withSuccessHandler(() => {
+        carregarTabelaHistorico();
+        alert("🗑️ Registro de prontuário removido com sucesso.");
+      })
+      .withFailureHandler(err => alert("❌ Falha técnica ao deletar: " + err))
+      .excluirRegistroProntuario(id);
+  }
+}
+
+/**
+ * LOGS SISTÊMICOS DO MÓDULO
+ */
+function logProntuario(acao, detalhes) {
+  google.script.run.salvarNoBancoDeLogs({
+    modulo: "PRONTUÁRIO",
+    acao: acao,
+    detalhes: detalhes,
+    usuario: "ADM"
+  });
+}
+</script>

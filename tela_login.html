@@ -1,0 +1,140 @@
+<style>
+  /* RESET GERAL E FONTE UNIFICADA */
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  /* FUNDO ABSTRATO PREMIUM COM ANIMAÇÃO SUAVE */
+  .login-fundo-premium {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #f8fafc, #f5f3ff, #f8fafc);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    z-index: -1;
+  }
+  
+  /* SOBREPOSIÇÃO DE FORMAS ORGÂNICAS E FLUIDAS */
+  .login-fundo-premium::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: 
+      radial-gradient(at 10% 20%, rgba(255, 64, 129, 0.05) 0px, transparent 50%),
+      radial-gradient(at 80% 80%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(255, 64, 129, 0.02) 0px, transparent 50%);
+    opacity: 0.8;
+  }
+
+  /* CONTAINER CENTRALIZADOR */
+  .login-wrapper-premium {
+    height: 100vh; display: flex;
+    justify-content: center; align-items: center;
+    padding: 20px; box-sizing: border-box;
+  }
+
+  /* CARTÃO DE LOGIN FLUTUANTE (PRESERVADO O CONTEÚDO ORIGINAL) */
+  .login-card-premium {
+    background: white; border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+    padding: 40px; width: 100%; max-width: 400px;
+    box-sizing: border-box;
+    text-align: center;
+    animation: cardFloatUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  /* CABEÇALHO COM A PALETA DA LASMIN */
+  .login-header-premium h2 {
+    margin: 0; color: #ff4081; /* Rosa Vibrante Original */
+    font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+  }
+  .login-header-premium h3 {
+    margin: 4px 0 30px 0; color: #ff4081; /* Rosa Vibrante Original */
+    font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  /* INPUTS PADRONIZADOS COM O ESTILO INTERNO (foco violeta) */
+  .group-input-login {
+    display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; text-align: left;
+  }
+  .group-input-login label {
+    font-size: 11px; font-weight: 700; color: #64748b; /* Slate */
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .input-field-login {
+    padding: 13px 16px; border: 1px solid #cbd5e1; border-radius: 10px;
+    font-size: 14px; color: #334155; background-color: #fff;
+    transition: all 0.2s ease; font-weight: 500;
+    width: 100%; box-sizing: border-box;
+  }
+  .input-field-login:focus {
+    border-color: #8b5cf6; /* Violeta Interno */
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); outline: none;
+  }
+
+  /* BOTÃO ENTRAR PADRONIZADO (VIOLETA/SLATE) */
+  .btn-entrar-premium {
+    background: #8b5cf6 !important; /* Violeta */
+    color: white !important; padding: 13px;
+    border-radius: 10px; font-weight: 700; font-size: 14px;
+    border: none; cursor: pointer; display: inline-flex;
+    align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    transition: all 0.2s ease; width: 100%; box-sizing: border-box;
+    margin-top: 10px;
+  }
+  .btn-entrar-premium:hover {
+    background: #7c3aed !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+  }
+
+  /* LINKS AUXILIARES */
+  .link-esqueci-senha {
+    display: inline-block; margin-top: 25px;
+    color: #64748b; font-size: 12px; text-decoration: none;
+    font-weight: 600; transition: color 0.2s;
+  }
+  .link-esqueci-senha:hover { color: #8b5cf6; }
+
+  /* ANIMAÇÕES */
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes cardFloatUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="login-fundo-premium"></div>
+
+<div class="login-wrapper-premium">
+  <div class="login-card-premium">
+    <div class="login-header-premium">
+      <h2>Lasmin Gabrielle</h2>
+      <h3>Psicóloga <span>Ψ</span></h3>
+    </div>
+    
+    <div class="group-input-login">
+      <label>E-mail Clínico</label>
+      <input type="email" id="email" class="input-field-login" placeholder="Ex: nome@email.com">
+    </div>
+    
+    <div class="group-input-login">
+      <label>Senha de Acesso</label>
+      <input type="password" id="senha" class="input-field-login" placeholder="Sua senha secreta">
+    </div>
+    
+    <button onclick="efetuarLogin()" class="btn-entrar-premium" id="btnEntrar">
+      <i class="fa-solid fa-right-to-bracket"></i> Acessar Sistema
+    </button>
+    
+    <a href="#" class="link-esqueci-senha" onclick="solicitarRecuperacao()">
+      <i class="fa-solid fa-key" style="margin-right: 4px;"></i> Esqueci a minha senha
+    </a>
+  </div>
+</div>

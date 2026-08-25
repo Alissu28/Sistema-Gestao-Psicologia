@@ -1,0 +1,179 @@
+<script>
+/**
+ * 1. CONTROLE DE ACESSO (Unificado e Protegido)
+ */
+function fazerLogin(event) {
+  // CRÍTICO: Impede o navegador de prosseguir sem a resposta do servidor
+  if (event) event.preventDefault(); 
+
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+  const btn = document.querySelector("#box-login button");
+  const erroDiv = document.getElementById("erroLogin");
+
+  console.log("Tentativa de login com:", email);
+
+  if (!email || !senha) {
+    alert("⚠️ Campos vazios! Preencha para continuar.");
+    return; 
+  }
+
+  // Feedback visual e bloqueio do botão
+  btn.disabled = true;
+  btn.innerHTML = "⏳ Validando credenciais...";
+  if(erroDiv) erroDiv.innerText = "";
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      console.log("Resposta recebida do servidor:", res);
+
+      if (res && res.sucesso === true) {
+        console.log("✅ Sucesso! Iniciando sistema...");
+        iniciarSistema(res.nome, res.usuario, res.perfil);
+      } else {
+        console.log("❌ Falha na validação!");
+        alert("Senha ou E-mail incorretos. Tente novamente.");
+        btn.disabled = false;
+        btn.innerHTML = "Entrar";
+        if(erroDiv) erroDiv.innerText = "E-mail ou senha inválidos.";
+        
+        // Garante que o sistema continue escondido
+        document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("sistema").style.display = "none";
+      }
+    })
+    .withFailureHandler(function(err) {
+      console.error("Erro no Google Script:", err);
+      alert("Erro crítico de conexão com o servidor.");
+      btn.disabled = false;
+      btn.innerHTML = "Entrar";
+    })
+    .login(email, senha);
+}
+
+/**
+ * 2. O PORTEIRO (Roda assim que a página abre)
+ */
+wwindow.onload = function() {
+  // Esconde o sistema e mostra o login imediatamente ao carregar/atualizar
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("sistema").style.display = "none";
+  
+  if(document.getElementById("email")) document.getElementById("email").value = "";
+  if(document.getElementById("senha")) document.getElementById("senha").value = "";
+  
+  // 2. SÓ DEPOIS PERGUNTA AO SERVIDOR
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res && res.sucesso) {
+         console.log("Sessão ativa encontrada para:", res.nome);
+         iniciarSistema(res.nome, res.usuario, res.perfil);
+      } else {
+         console.log("Sistema resetado. Aguardando login...");
+};
+    })
+    .withFailureHandler(function() {
+       console.log("Erro ao validar sessão. Mantendo bloqueio.");
+    })
+    .verificarLogin();
+};
+
+/**
+ * 3. A CHAVE (Abre o sistema)
+ */
+function iniciarSistema(nome, email, perfil) {
+  if (!nome || !perfil || nome === "" || perfil === "") {
+    console.error("Acesso negado: dados incompletos.");
+    location.reload();
+    return;
+  }
+
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("sistema").style.display = "block";
+  
+  window.perfilLogado = String(perfil).toUpperCase().trim();
+  
+  const divUser = document.getElementById("usuarioLogado");
+  if(divUser) {
+    divUser.innerHTML = `<b>${nome}</b><br><small>${email}</small>`;
+  }
+  
+  const btnAdmin = document.getElementById("btnAdminUsers");
+  if(btnAdmin) {
+    btnAdmin.style.display = (window.perfilLogado === 'ADMIN') ? "block" : "none";
+  }
+
+  showDashboard();
+}
+
+/**
+ * 4. NAVEGAÇÃO E INTERFACE
+ */
+function showDashboard() {
+  const main = document.getElementById("main");
+  main.innerHTML = `<div style="text-align:center; padding:50px;">📊 Carregando dados...</div>`;
+
+  google.script.run
+    .withSuccessHandler(html => {
+      main.innerHTML = html;
+      setTimeout(() => {
+        if (typeof buscarDadosDash === "function") buscarDadosDash();
+      }, 100);
+    })
+    .carregarDashboard();
+}
+
+function sair() {
+  if (confirm("Deseja realmente sair do PsiManager?")) {
+    // 1. Desabilita o botão ou mostra um aviso para o usuário não clicar duas vezes
+    console.log("Encerrando sessão...");
+
+    // 2. Chama a função de limpeza no servidor.gs
+    google.script.run
+      .withSuccessHandler(function() {
+        // 3. Quando o servidor confirmar que limpou, recarregamos a página
+        // O location.reload(true) força o navegador a limpar o cache e voltar pro login
+        window.location.reload(true); 
+      })
+      .withFailureHandler(function(err) {
+        console.error("Erro ao deslogar:", err);
+        // Mesmo se falhar a conexão, forçamos o reload para segurança
+        window.location.reload(true);
+      })
+      .logout(); 
+  }
+}
+
+function mostrarEsqueciSenha() {
+  document.getElementById("box-login").style.display = "none";
+  document.getElementById("box-recuperar").style.display = "block";
+}
+
+function mostrarLogin() {
+  document.getElementById("box-login").style.display = "block";
+  document.getElementById("box-recuperar").style.display = "none";
+}
+
+function prepararTela() {
+  const main = document.getElementById("main");
+  main.innerHTML = ""; 
+  main.style.display = "block";
+  const dashContainer = document.getElementById("dashboard-container");
+  if(dashContainer) dashContainer.style.display = "none";
+}
+
+function abrirFinanceiro() { prepararTela(); showFinanceiro(); }
+function abrirPacientes() { prepararTela(); listarPacientes(); }
+function abrirAgenda() { prepararTela(); }
+
+
+function logLogin(email, status) {
+  google.script.run.salvarNoBancoDeLogs({
+    modulo: "ACESSO",
+    acao: "LOGIN " + status,
+    detalhes: "Tentativa de acesso com o e-mail: " + email,
+    usuario: email // Aqui usamos o próprio e-mail digitado
+  });
+}
+
+</script>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <?!= include('styles'); ?>
+  
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; background: #f8fafc; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    
+    #main {
+      min-height: 80vh;
+      background: white;
+      width: 100%;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ==========================================
+       ESTILIZAÇÃO PREMIUM DA TELA DE LOGIN WITH BG IMAGE
+       ========================================== */
+    #loginScreen { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+      display: flex; align-items: center; justify-content: center; 
+      /* Imagem de fundo abstrata, suave e profissional voltada para bem-estar/saúde */
+      background: url('https://img.magnific.com/fotos-premium/doodle-criativo-do-cerebro_670147-21860.jpg') no-repeat center center;
+      background-size: cover;
+      z-index: 9999;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Camada de vidro (Glassmorphism) e filtro para destacar o cartão */
+    #loginScreen::before {
+      content: ''; 
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(248, 250, 252, 0.65); /* Cortina clara para suavizar a imagem de trás */
+      backdrop-filter: blur(8px); /* Efeito desfoque de vidro super moderno */
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1;
+    }
+    
+    /* Box flutuante moderno com efeito leve de transparência */
+    .login-box { 
+      background: rgba(255, 255, 255, 0.94); 
+      padding: 40px; 
+      border-radius: 24px; 
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12); 
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      width: 100%; 
+      max-width: 380px; 
+      box-sizing: border-box;
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(10px);
+      animation: cardFloatUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .login-title-premium {
+      text-align: center; 
+      color: #ff4db2; 
+      margin: 0 0 4px 0; 
+      font-size: 22px; 
+      font-weight: 800; 
+      letter-spacing: -0.5px;
+    }
+
+    .login-subtitle-premium {
+      text-align: center; 
+      color: #7c3aed; 
+      margin: 0 0 30px 0; 
+      font-size: 16px; 
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Inputs reestilizados com foco violeta corporativo */
+    .input-login-premium {
+      width: 100%; 
+      padding: 13px 16px; 
+      margin-bottom: 16px; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 10px; 
+      box-sizing: border-box;
+      font-size: 14px;
+      color: #334155;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+    .input-login-premium:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    /* Botão de Ação Principal */
+    .btn-login-premium {
+      width: 100%; 
+      background: #8b5cf6; 
+      color: white; 
+      padding: 13px; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+      transition: all 0.2s ease;
+    }
+    .btn-login-premium:hover {
+      background: #7c3aed;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(139, 92, 246, 0.25);
+    }
+
+    /* Link Secundário */
+    .link-login-secondary {
+      text-align: center; 
+      margin-top: 25px;
+      margin-bottom: 0;
+    }
+    .link-login-secondary a {
+      color: #64748b; 
+      text-decoration: none; 
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .link-login-secondary a:hover {
+      color: #8b5cf6;
+    }
+
+    /* Animações de fundo e entrada do card */
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes cardFloatUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================
+       ESTILOS DO SISTEMA INTERNO E SIDEBAR
+       ========================================== */
+    #sistema { display: none; width: 100%; height: 100vh; }
+    .container { display: flex; height: 100vh; width: 100%; overflow: hidden; }
+    .sidebar { background: #1e293b; color: white; width: 260px; display: flex; flex-direction: column; }
+    .content { flex: 1; overflow-y: auto; padding: 25px; background: #f8fafc; position: relative; }
+    #main { width: 100%; max-width: 1200px; margin: 0 auto; }
+    
+    .submenu { padding-left: 15px; background: rgba(0,0,0,0.2); border-radius: 4px; margin: 5px 10px; }
+    .menu-btn { cursor: pointer; border: none; width: 100%; text-align: left; background: transparent; padding: 12px 20px; color: #cbd5e1; font-size: 14px; transition: 0.2s; }
+    .menu-btn:hover { background: rgba(255, 77, 178, 0.1); color: white; }
+    .logout-btn { background: #ef4444 !important; color: white !important; margin-top: auto; }
+  </style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box" id="box-login">
+    <h2 class="login-title-premium">Consultório de Psicologia</h2>
+    <h3 class="login-subtitle-premium">Psicóloga Clinica <span style="font-family: serif; font-weight: normal;">Ψ</span></h3>
+    
+    <input type="email" id="email" placeholder="Seu e-mail cadastrado" class="input-login-premium">
+    <input type="password" id="senha" placeholder="Sua senha de acesso" class="input-login-premium">
+    
+    <button type="button" onclick="fazerLogin(event)" class="btn-login-premium">
+      <i class="fa-solid fa-right-to-bracket"></i> Entrar no Sistema
+    </button>
+    
+    <p id="erroLogin" style="color: #ef4444; font-size: 13px; text-align: center; margin-top: 12px; font-weight: 600;"></p>
+    <p class="link-login-secondary">
+    <a href="#" onclick="event.preventDefault(); document.getElementById('box-login').style.display='none'; document.getElementById('box-recuperar').style.display='block';">
+    <i class="fa-solid fa-unlock-keyhole" style="margin-right: 4px; font-size: 12px;"></i> Esqueci a minha senha
+    </a>
+    </p>
+  </div>
+  
+  <div class="login-box" id="box-recuperar" style="display:none">
+    <h2 class="login-title-premium" style="color: #7c3aed; margin-bottom: 6px;">Recuperar Senha</h2>
+    <p style="color: #64748b; font-size: 13px; text-align: center; margin: 0 0 20px 0; font-weight: 500;">Insira as credenciais para redefinir o acesso.</p>
+    
+    <input type="email" id="rec_email" placeholder="E-mail da sua conta" class="input-login-premium">
+    <input type="password" id="rec_senha" placeholder="Nova senha desejada" class="input-login-premium" style="margin-bottom: 20px;">
+    
+    <button onclick="redefinirSenhaUsuario()" class="btn-login-premium" style="background: #7c3aed;">
+      <i class="fa-solid fa-key"></i> Redefinir Senha
+    </button>
+    
+    <button style="background: none; border: none; color: #94a3b8; width: 100%; margin-top: 15px; cursor: pointer; font-size: 13px; font-weight: 600; transition: color 0.2s;" 
+        onclick="event.preventDefault(); document.getElementById('box-recuperar').style.display='none'; document.getElementById('box-login').style.display='block';">
+      <i class="fa-solid fa-chevron-left" style="margin-right: 4px;"></i> Voltar para o login
+    </button>
+  </div>
+</div>
+
+<div id="sistema">
+  <div class="container">
+       <div class="sidebar escondida" id="sidebar">
+        <div onclick="toggleSidebar()" style="padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+       <h2 style="color:white; margin:0; font-size:20px;">☰ <span class="menu-texto">Mente Leve</span></h2>
+       <div id="usuarioLogado" class="usuario-logado" style="font-size:12px; color:#f9a8d4; margin-top:5px;"></div>
+    </div>
+
+      <div class="sidebar-scroll" style="overflow-y: auto; flex: 1;">
+      <p class="menu-texto" style="padding: 15px 20px 5px; font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: bold;">Menu</p>
+      
+      <button class="menu-btn" onclick="showDashboard()"><span>📊</span> <span class="menu-texto">Dashboard</span></button>
+      <button class="menu-btn" onclick="showAgenda()"><span>📅</span> <span class="menu-texto">Agenda</span></button>
+      
+      <p class="menu-texto" style="padding: 15px 20px 5px; font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: bold;">Clínica</p>
+      <button class="menu-btn" onclick="showPacientes()"><span>👥</span> <span class="menu-texto">Pacientes</span></button>
+      <button class="menu-btn" onclick="showSessoes()"><span>📝</span> <span class="menu-texto">Sessões</span></button>
+      <button class="menu-btn" onclick="abrirTelaProntuarios()"><span>📋</span> <span class="menu-texto">Prontuários</span></button>
+
+      <p class="menu-texto" style="padding: 15px 20px 5px; font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: bold;">Finanças</p>
+      <button class="menu-btn" onclick="showFinanceiro()"><span>💰</span> <span class="menu-texto">Financeiro</span></button>
+      
+      <p class="menu-texto" style="padding: 15px 20px 5px; font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: bold;">Ajustes</p>
+      <button class="menu-btn" onclick="showConfiguracoes()"><span>⚙️</span> <span class="menu-texto">Configurações</span></button>
+</div>
+      
+  <div class="logout-btn">
+     <a class="nav-link text-danger" onclick="window.top.location.href = '<?!= ScriptApp.getService().getUrl(); ?>';">
+     <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
+      </a>
+  </div>
+    </div>
+
+    <div class="content">
+      <div id="main"></div>
+    </div>
+  </div>
+</div>
+
+<?!= include('js_main'); ?>
+<?!= include('js_dashboard'); ?>
+<?!= include('js_pacientes'); ?>
+<?!= include('js_agenda'); ?>
+<?!= include('js_sessoes'); ?>
+<?!= include('js_financeiro'); ?>
+<?!= include('js_config'); ?>
+<?!= include('js_usuarios'); ?>
+<?!= include('js_prontuario'); ?>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("escondida");
+  }
+
+  function toggleSubmenu(id) {
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar.classList.contains('escondida')) {
+      sidebar.classList.remove('escondida');
+    }
+    const sub = document.getElementById(id);
+    document.querySelectorAll('.submenu').forEach(s => { if(s.id !== id) s.style.display = 'none'; });
+    sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
+  }
+
+  // ====== FUNÇÕES ADICIONADAS PARA ALTERNAR ENTRE LOGIN E RECUPERAÇÃO ======
+  function mostrarEsqueciSenha() {
+    const boxLogin = document.getElementById("box-login");
+    const boxRecuperar = document.getElementById("box-recuperar");
+    if (boxLogin && boxRecuperar) {
+      boxLogin.style.display = "none";
+      boxRecuperar.style.display = "block";
+    }
+  }
+
+  function mostrarLogin() {
+    const boxLogin = document.getElementById("box-login");
+    const boxRecuperar = document.getElementById("box-recuperar");
+    if (boxLogin && boxRecuperar) {
+      boxRecuperar.style.display = "none";
+      boxLogin.style.display = "block";
+    }
+  }
+
+  function ajustarAlturaSidebar() {
+    const scroll = document.querySelector('.sidebar-scroll');
+    if(scroll) scroll.style.height = (window.innerHeight - 150) + 'px';
+  }
+
+  window.addEventListener('resize', ajustarAlturaSidebar);
+  window.addEventListener('load', ajustarAlturaSidebar);
+
+  // ====== ENVIAR NOVA SENHA PARA O SERVIDOR ======
+  function redefinirSenhaUsuario() {
+    const emailField = document.getElementById("rec_email");
+    const senhaField = document.getElementById("rec_senha");
+    
+    if (!emailField || !senhaField) return;
+    
+    const email = emailField.value.trim();
+    const senha = senhaField.value.trim();
+    
+    if (email === "" || senha === "") {
+      alert("⚠️ Por favor, preencha o e-mail e a nova senha!");
+      return;
+    }
+    
+    // Altera o texto do botão para dar feedback visual
+    const btn = document.querySelector("#box-recuperar .btn-login-premium");
+    const textoOriginal = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+    
+    // Chama o servidor no Código.gs para salvar no banco
+    google.script.run
+      .withSuccessHandler(function(resultado) {
+        btn.disabled = false;
+        btn.innerHTML = textoOriginal;
+        
+        // Altere aqui caso seu servidor retorne outra estrutura (ex: resultado.sucesso)
+        if (resultado) {
+          alert("✅ Senha redefinida com sucesso!");
+          emailField.value = "";
+          senhaField.value = "";
+          mostrarLogin(); // Volta para a tela de login
+        } else {
+          alert("❌ Erro: Usuário não encontrado ou e-mail inválido.");
+        }
+      })
+      .withFailureHandler(function(erro) {
+        btn.disabled = false;
+        btn.innerHTML = textoOriginal;
+        console.error(erro);
+        alert("❌ Falha na comunicação com o servidor.");
+      })
+      .alterarSenhaNoServidor(email, senha); // <--- ATENÇÃO: Confirme se no seu Código.gs o nome é exatamente esse!
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<script>
+let usuariosCache = [];
+
+function showUsuarios() {
+  if (window.perfilLogado !== 'ADMIN') {
+    document.getElementById("main").innerHTML = `
+      <div class="card">
+        <h2 style="color:#7f1d1d">Acesso Negado</h2>
+        <p>Apenas administradores podem acessar a gestão de usuários. Seu perfil atual foi lido como: <b>${window.perfilLogado}</b></p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById("main").innerHTML = `
+    <div class="card">
+      <h2 class="title">Gestão de Usuários</h2>
+      <div id="listaUsuarios">Carregando...</div>
+    </div>
+  `;
+
+  google.script.run
+    .withSuccessHandler(data => {
+      usuariosCache = data.slice(1);
+      renderizarUsuarios(usuariosCache);
+    }).listarUsuarios();
+}
+
+function renderizarUsuarios(lista) {
+  let html = `<table style="width:100%; text-align:left; border-collapse:collapse;">
+    <tr style="border-bottom:2px solid #cbd5e1;">
+      <th style="padding:10px;">Nome</th>
+      <th style="padding:10px;">Email</th>
+      <th style="padding:10px;">Perfil</th>
+      <th style="padding:10px;">Ações</th>
+    </tr>`;
+
+  lista.forEach(u => {
+    // Array: u[1]=Nome, u[2]=Email, u[3]=Senha (escondida), u[4]=Perfil
+    html += `
+      <tr style="border-bottom:1px solid #e2e8f0;">
+        <td style="padding:10px;">${u[1]}</td>
+        <td style="padding:10px;">${u[2]}</td>
+        <td style="padding:10px;"><b>${u[4]}</b></td>
+        <td style="padding:10px;">
+          <button class="btn" style="padding:6px 12px; font-size:12px; background:#475569;" onclick="resetarSenhaAdmin('${u[2]}')">Redefinir Senha</button>
+        </td>
+      </tr>
+    `;
+  });
+  html += `</table>`;
+  document.getElementById("listaUsuarios").innerHTML = html;
+}
+
+function resetarSenhaAdmin(email) {
+  const novaSenha = prompt(`Digite a nova senha para o usuário ${email}:`);
+  
+  // Se o admin cancelar o prompt ou deixar em branco, não faz nada
+  if (!novaSenha) return;
+
+  google.script.run
+    .withSuccessHandler(sucesso => {
+      if(sucesso) alert("Senha atualizada com sucesso no banco de dados!");
+      else alert("Erro ao atualizar. Email não encontrado.");
+    }).atualizarSenha(email, novaSenha);
+}
+
+function logUsuarios(acao, detalhes) {
+  google.script.run.salvarNoBancoDeLogs({
+    modulo: "USUÁRIOS",    // Isso preencherá a coluna "Tabela"
+    acao: acao,            // Coluna "Acao"
+    detalhes: detalhes,    // Coluna "Detalhes"
+    usuario: "ADM"         // Coluna "Usuario"
+  });
+}
+
+</script>

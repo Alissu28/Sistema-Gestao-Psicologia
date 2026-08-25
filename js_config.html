@@ -1,0 +1,489 @@
+<style>
+  /* DESIGN PREMIUM E RESET DE TELA CHEIA PARA CONFIGURAÇÕES */
+  .config-container-premium {
+    padding: 24px !important;
+    background-color: #f8fafc !important;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    animation: configFadeIn 0.25s ease-out;
+  }
+  
+  .config-card-premium { 
+    background: white !important; 
+    border-radius: 16px !important; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02) !important; 
+    padding: 32px !important; 
+    border: 1px solid #e2e8f0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .config-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 100%;
+  }
+
+  /* REESTILIZAÇÃO DOS BOTÕES */
+  .btn-config-custom {
+    background: #8b5cf6 !important;
+    color: white !important;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    transition: all 0.2s ease;
+  }
+  .btn-config-custom:hover {
+    background: #7c3aed !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+  }
+  
+  .btn-action-round {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  .btn-action-round.save { background: #f0fdf4; color: #16a34a; border: 1px solid rgba(22, 163, 74, 0.15); }
+  .btn-action-round.save:hover { background: #16a34a; color: white; }
+  .btn-action-round.delete { background: #fef2f2; color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.15); }
+  .btn-action-round.delete:hover { background: #dc2626; color: white; }
+  .btn-action-round:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; border: none; }
+
+  /* REESTILIZAÇÃO DA TABELA */
+  .table-responsive-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+  .user-table-premium { 
+    width: 100%; 
+    border-collapse: collapse; 
+    background: white;
+  }
+  .user-table-premium th { 
+    background: #f8fafc; 
+    color: #64748b; 
+    font-size: 11px; 
+    font-weight: 700;
+    text-transform: uppercase; 
+    padding: 14px 18px; 
+    text-align: left; 
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .user-table-premium td { 
+    padding: 16px 18px; 
+    border-bottom: 1px solid #f1f5f9; 
+    vertical-align: middle; 
+  }
+  .user-table-premium tr:last-child td { border-bottom: none; }
+  .user-table-premium tr:hover td { background-color: #fafafa; }
+  
+  /* INPUTS DA TABELA - CORRIGIDO O BOX-SIZING */
+  .input-field-config { 
+    padding: 10px 12px; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 8px; 
+    font-size: 13px; 
+    color: #334155;
+    background-color: #fff;
+    transition: all 0.2s;
+    font-weight: 500;
+    box-sizing: border-box !important;
+  }
+  .input-field-config:focus { 
+    border-color: #8b5cf6; 
+    outline: none; 
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); 
+  }
+
+  /* SELECT CORRIGIDO: Largura ideal e padding para não amassar a seta */
+  .select-profile-secure {
+    width: 190px !important;
+    padding-right: 28px !important;
+    cursor: pointer;
+  }
+
+  /* CONTAINER DA SENHA TOTALMENTE REAJUSTADO */
+  .password-box-secure {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: 170px !important;
+  }
+  .password-box-secure input {
+    width: 120px !important;
+    flex-shrink: 0 !important;
+  }
+  .btn-eye-secure {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #64748b;
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    box-sizing: border-box !important;
+  }
+  .btn-eye-secure:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+
+  /* ESTILO DO FORMULÁRIO DE NOVO USUÁRIO */
+  .form-novo-usuario {
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: none;
+    animation: configFadeIn 0.3s ease;
+  }
+
+  @keyframes configFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+/**
+ * EXIBE A TELA PRINCIPAL DE CONFIGURAÇÕES
+ */
+function showConfiguracoes() {
+  const main = document.getElementById("main");
+  if (!main) return;
+
+  main.innerHTML = `
+    <div class="config-container-premium">
+      <div class="config-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 50px; height: 50px; background-color: #f5f3ff; color: #8b5cf6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid rgba(139, 92, 246, 0.15);">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h2 style="color: #0f172a; font-weight: 800; margin: 0; font-size: 24px; letter-spacing: -0.5px;">Controle de Acesso</h2>
+            <p style="color: #64748b; font-size: 14px; margin: 4px 0 0 0; font-weight: 500;">Gerencie permissões, perfis clínicos e senhas dos usuários do sistema</p>
+          </div>
+        </div>
+        <button class="btn-config-custom" onclick="alternarFormUsuario()">
+          <i class="fa-solid fa-user-plus"></i> Novo Usuário
+        </button>
+      </div>
+
+      <div id="formNovoUsuarioContainer" class="form-novo-usuario">
+        <h4 style="margin: 0 0 16px 0; color: #0f172a; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-user-gear" style="color:#8b5cf6;"></i> Cadastrar Novo Colaborador
+        </h4>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+          <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Nome Completo</label>
+            <input type="text" id="nu_nome" class="input-field-config" placeholder="Ex: Dr. Carlos Silva">
+          </div>
+          <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">E-mail de Acesso</label>
+            <input type="email" id="nu_email" class="input-field-config" placeholder="nome@email.com">
+          </div>
+          <div style="flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase;">Senha Inicial</label>
+            <div class="password-box-secure" style="width: 100% !important;">
+              <input type="password" id="nu_senha" class="input-field-config" placeholder="Senha" style="flex:1 !important; width: 100% !important;">
+              <button type="button" class="btn-eye-secure" onclick="alternarVisibilidadeSenha('nu_senha', this)">
+                <i class="fa-solid fa-eye-slash"></i>
+              </button>
+            </div>
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 8px;">
+            <button class="btn-config-custom" onclick="salvarNovoUsuarioForm()" id="btnCriarUsuario">
+              <i class="fa-solid fa-check"></i> Criar
+            </button>
+            <button class="btn-config-custom" style="background:#e2e8f0 !important; color:#475569 !important; box-shadow:none;" onclick="alternarFormUsuario()">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-card-premium">
+        <div id="tabelaUsuariosContainer">
+          <div style="padding: 60px 0; text-align: center; color: #64748b; font-weight: 500;">
+            <i class="fa-solid fa-circle-notch fa-spin" style="color: #8b5cf6; font-size: 24px; margin-bottom: 12px;"></i><br>
+            Sincronizando usuários ativos...
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  renderTabelaUsuarios();
+}
+
+/**
+ * RENDERIZA A TABELA AJUSTADA
+ */
+function renderTabelaUsuarios() {
+  const container = document.getElementById("tabelaUsuariosContainer");
+  if(!container) return;
+  
+  google.script.run
+    .withSuccessHandler(usuarios => {
+      if (!usuarios || usuarios.length === 0) {
+        container.innerHTML = `
+          <div style='text-align:center; padding: 40px; color: #64748b; font-weight:500;'>
+            <i class="fa-solid fa-user-slash" style="font-size:32px; color:#cbd5e1; margin-bottom:12px;"></i><br>
+            Nenhum usuário encontrado na base de dados.
+          </div>`;
+        return;
+      }
+
+      let html = `
+        <div class="table-responsive-wrapper">
+          <table class="user-table-premium">
+            <thead>
+              <tr>
+                <th>Usuário / Identificação</th>
+                <th>Perfil de Acesso</th>
+                <th>Chave / Senha</th>
+                <th style="text-align:right; padding-right:24px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>`;
+
+      usuarios.forEach(u => {
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight: 700; color: #0f172a; font-size: 14px;">${u[1].toString().toUpperCase()}</div>
+              <div style="font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px;">
+                <i class="fa-regular fa-envelope" style="margin-right:4px;"></i>${u[2]}
+              </div>
+            </td>
+            <td>
+              <select id="perfil_${u[0]}" class="input-field-config select-profile-secure">
+                <option value="ADMIN" ${u[4] === 'ADMIN' ? 'selected' : ''}>⚙️ ADMINISTRADOR</option>
+                <option value="PSICOLOGO" ${u[4] === 'PSICOLOGO' ? 'selected' : ''}>🧠 PSICÓLOGO</option>
+              </select>
+            </td>
+            <td>
+              <div class="password-box-secure">
+                <input type="password" id="senha_${u[0]}" value="${u[3]}" class="input-field-config" style="font-family: monospace; letter-spacing: 0.5px;">
+                <button type="button" class="btn-eye-secure" onclick="alternarVisibilidadeSenha('senha_${u[0]}', this)">
+                  <i class="fa-solid fa-eye-slash"></i>
+                </button>
+              </div>
+            </td>
+            <td style="text-align: right; padding-right:24px;">
+              <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn-action-round save" onclick="salvarAcessoUsuario('${u[0]}')" title="Salvar Alterações">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                </button>
+                <button class="btn-action-round delete" onclick="deletarUsuario('${u[0]}', '${u[1]}')" title="Excluir Colaborador">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>`;
+      });
+
+      html += `</tbody></table></div>`;
+      container.innerHTML = html;
+    })
+    .withFailureHandler(err => {
+      container.innerHTML = `
+        <div style="color: #ef4444; padding: 24px; text-align:center; font-weight:500;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size:24px; margin-bottom:8px;"></i><br>
+          Falha ao se conectar com o servidor: ${err}
+        </div>`;
+    })
+    .listarUsuariosConfig();
+}
+
+/**
+ * ALTERNA A VISIBILIDADE DA SENHA
+ */
+function alternarVisibilidadeSenha(inputId, elementoBotao) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  
+  const icone = elementoBotao.querySelector('i');
+  if(!icone) return;
+
+  if (input.type === "password") {
+    input.type = "text";
+    icone.className = "fa-solid fa-eye";
+    elementoBotao.style.background = "#f5f3ff";
+    elementoBotao.style.color = "#8b5cf6";
+    elementoBotao.style.borderColor = "rgba(139, 92, 246, 0.3)";
+  } else {
+    input.type = "password";
+    icone.className = "fa-solid fa-eye-slash";
+    elementoBotao.style.background = "#f1f5f9";
+    elementoBotao.style.color = "#64748b";
+    elementoBotao.style.borderColor = "#cbd5e1";
+  }
+}
+
+/**
+ * SALVA AS ALTERAÇÕES DO USUÁRIO
+ */
+function salvarAcessoUsuario(id) {
+  const btn = event.target.closest('button');
+  let originalContent = "";
+  if(btn) {
+    originalContent = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i>";
+  }
+  
+  const dados = {
+    id: id,
+    perfil: document.getElementById("perfil_" + id).value,
+    senha: document.getElementById("senha_" + id).value.trim()
+  };
+
+  if(!dados.senha) {
+    alert("⚠️ A senha não pode ficar em branco!");
+    if(btn) { btn.disabled = false; btn.innerHTML = originalContent; }
+    document.getElementById("senha_" + id).focus();
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(res => {
+      if(res.sucesso) {
+        alert("✅ Nível de acesso e senha updated com sucesso!");
+        logConfig("ALTERAR PERMISSÃO", `ID Usuário: ${id} - Perfil: ${dados.perfil}`);
+      } else {
+        alert("❌ Erro operacional: " + res.erro);
+      }
+      if(btn) { btn.disabled = false; btn.innerHTML = originalContent; }
+    })
+    .withFailureHandler(err => {
+      alert("❌ Erro de conexão técnico: " + err);
+      if(btn) { btn.disabled = false; btn.innerHTML = originalContent; }
+    })
+    .atualizarAcessoUsuario(dados);
+}
+
+/**
+ * CONTROLA A EXIBIÇÃO DO FORMULÁRIO EMBUTIDO
+ */
+function alternarFormUsuario() {
+  const f = document.getElementById("formNovoUsuarioContainer");
+  if(!f) return;
+  if(f.style.display === "block") {
+    f.style.display = "none";
+  } else {
+    f.style.display = "block";
+    document.getElementById("nu_nome").focus();
+  }
+}
+
+/**
+ * SALVA O NOVO USUÁRIO VINDO DO FORMULÁRIO EMBUTIDO
+ */
+function salvarNovoUsuarioForm() {
+  const nome = document.getElementById("nu_nome").value.trim();
+  const email = document.getElementById("nu_email").value.trim();
+  const senha = document.getElementById("nu_senha").value.trim();
+  const btn = document.getElementById("btnCriarUsuario");
+
+  if(!nome) { alert("⚠️ Digite o nome completo!"); document.getElementById("nu_nome").focus(); return; }
+  if(!email) { alert("⚠️ Digite o e-mail de acesso!"); document.getElementById("nu_email").focus(); return; }
+  if(!senha || senha.length < 4) { alert("⚠️ Insira uma senha segura de no mínimo 4 dígitos!"); document.getElementById("nu_senha").focus(); return; }
+
+  if(btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Criando...";
+  }
+
+  const novoU = { nome: nome, email: email, senha: senha };
+
+  google.script.run
+    .withSuccessHandler(res => {
+      if(res.sucesso) {
+        alert("✅ Novo usuário registrado com sucesso!");
+        logConfig("CRIAR USUÁRIO", `Nome: ${nome} - Email: ${email}`);
+        
+        document.getElementById("nu_nome").value = "";
+        document.getElementById("nu_email").value = "";
+        document.getElementById("nu_senha").value = "";
+        
+        const fSenha = document.getElementById("nu_senha");
+        fSenha.type = "password";
+        
+        alternarFormUsuario();
+        renderTabelaUsuarios();
+      } else {
+        alert("❌ Não foi possível criar: " + res.erro);
+      }
+      if(btn) { btn.disabled = false; btn.innerHTML = "<i class='fa-solid fa-check'></i> Criar"; }
+    })
+    .withFailureHandler(err => {
+      alert("❌ Falha técnica ao salvar: " + err);
+      if(btn) { btn.disabled = false; btn.innerHTML = "<i class='fa-solid fa-check'></i> Criar"; }
+    })
+    .criarNovoUsuario(novoU);
+}
+
+/**
+ * EXCLUI ACESSO DE USUÁRIO
+ */
+function deletarUsuario(id, nome) {
+  if (!confirm(`⚠️ Você tem certeza absoluta que deseja revogar permanentemente o acesso de ${nome.toUpperCase()}?\nEsta ação não poderá ser desfeita.`)) return;
+
+  google.script.run
+    .withSuccessHandler(res => {
+      if(res.sucesso) {
+        alert("🗑️ O acesso do usuário foi revogado com sucesso!");
+        logConfig("EXCLUIR USUÁRIO", `ID: ${id} - Nome: ${nome}`);
+        renderTabelaUsuarios();
+      } else {
+        alert("❌ Falha ao excluir: " + res.erro);
+      }
+    })
+    .excluirUsuarioSistema(id);
+}
+
+/**
+ * LOGS SISTÊMICOS
+ */
+function logConfig(acao, detalhes) {
+  google.script.run.salvarNoBancoDeLogs({
+    modulo: "CONFIGURAÇÕES",
+    acao: acao,
+    detalhes: detalhes,
+    usuario: "ADM"
+  });
+}
+</script>

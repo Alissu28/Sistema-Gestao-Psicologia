@@ -1,0 +1,258 @@
+<style>
+:root { 
+  /* CORES SISTEMA */
+  --sidebar: #2c333d; 
+  --bg: #f1f3f5;      
+  --card: #ffffff; 
+  --accent: #ff4db2;  
+  --accent-hover: #e03e9b; 
+  --muted: #64748b; 
+  --sidebar-width: 240px;
+  --sidebar-mini: 70px;
+}
+
+* { box-sizing: border-box; transition: all 0.2s ease; }
+
+body { 
+  margin: 0; 
+  font-family: "Segoe UI", sans-serif; 
+  background: var(--bg); 
+  overflow: hidden; /* Importante para manter o layout fixo */
+}
+
+.container { 
+  display: flex; 
+  height: 100vh; 
+  width: 100vw; 
+}
+
+/* BARRA LATERAL */
+.sidebar { 
+  width: var(--sidebar-width); 
+  background: var(--sidebar); 
+  color: white; 
+  display: flex; 
+  flex-direction: column;
+  flex-shrink: 0; /* Impede que o conteúdo da direita empurre a barra */
+  height: 100vh;
+  z-index: 1000;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* ESTADO RECOLHIDO (PADRÃO) */
+.sidebar.escondida { 
+  width: var(--sidebar-mini); 
+}
+
+/* BOTÃO HAMBÚRGUER */
+.toggle-btn {
+  background: #1a1f26; 
+  color: white; 
+  border: none; 
+  padding: 15px; 
+  cursor: pointer; 
+  text-align: center; 
+  font-size: 20px;
+  width: 100%;
+  display: block;
+}
+.toggle-btn:hover { background: #334155; }
+
+/* ÁREA DE SCROLL DO MENU */
+.sidebar-scroll {
+  flex: 1; 
+  overflow-y: auto; 
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* COMPORTAMENTO DOS ITENS QUANDO ESCONDIDA */
+.sidebar.escondida .menu-texto, 
+.sidebar.escondida h3, 
+.sidebar.escondida .usuario-logado,
+.sidebar.escondida .submenu-seta { 
+  display: none !important; 
+}
+
+/* AJUSTE DOS BOTÕES PARA NÃO ESTOURAR */
+.menu-btn { 
+  width: 100%; 
+  padding: 15px 25px; /* Aumentei o respiro interno */
+  margin-bottom: 5px; 
+  border: none; 
+  background: transparent; 
+  color: #cbd5e1; 
+  cursor: pointer; 
+  text-align: left; 
+  display: flex; 
+  align-items: center; 
+  gap: 18px; /* Espaço maior entre ícone e texto */
+  white-space: nowrap;
+  font-size: 16px; /* Texto maior (era 14px) */
+  font-weight: 500;
+}
+
+/* Tamanho dos ícones/emojis */
+.menu-btn span:first-child, 
+.menu-btn i {
+  font-size: 22px; /* Ícones bem mais visíveis */
+  min-width: 28px;
+  text-align: center;
+}
+
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent);
+}
+
+/* SUBMENU */
+.submenu { display: none; flex-direction: column; background: rgba(0,0,0,0.1); }
+.submenu.aberto { display: flex; }
+.sidebar.escondida .submenu { display: none !important; }
+
+/* --- O BOTÃO SAIR DEFINITIVO (SEM BUG) --- */
+.logout-btn { 
+  background-color: #ef4444 !important; 
+  color: white !important; 
+  border: none;
+  cursor: pointer;
+  
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%); /* Centraliza perfeitamente no eixo X */
+  
+  /* Largura dinâmica baseada no pai */
+  width: calc(100% - 30px); 
+  max-width: 220px; /* Limite para não estourar em telas grandes */
+  height: 55px; /* Mais alto e fácil de clicar */
+  border-radius: 12px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-sizing: border-box; /* IMPEDE O BOTÃO DE SAIR DA TELA */
+}
+
+.sidebar.escondida .logout-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+  /* Centraliza o botão transformando em um círculo */
+  margin: auto 12px 20px 12px; /* Margem ajustada para os 70px */
+  padding-left: 0;
+  justify-content: center; /* Centraliza o ícone */
+  width: 45px; /* Tamanho fixo para o círculo */
+  height: 45px;
+  border-radius: 50%; /* Vira um círculo perfeito */
+}
+
+/* Efeito Hover do Botão Sair */
+.logout-btn:hover {
+  background-color: #b91c1c; /* Vermelho mais vivo no hover */
+}
+
+/* CONTEÚDO PRINCIPAL (COM SCROLL INDEPENDENTE) */
+.content { 
+  flex: 1; 
+  padding: 30px; 
+  overflow-y: auto; 
+  height: 100vh; 
+  background: var(--bg);
+}
+
+/* CARDS E TABELAS */
+.card { 
+  background: var(--card); padding: 25px; border-radius: 16px; 
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05); margin-bottom: 25px; 
+  border-top: 4px solid var(--accent);
+}
+
+// Lista de pacientes dentro de "meus pacientes", vai ate "btn-gerenciar:hover"
+
+.psi-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-top: 25px;
+  border: 1px solid #e2e8f0;
+  width: 100%;
+}
+
+.psi-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+/* Cabeçalho mais alto e com fonte maior */
+.psi-table th {
+  background: #f1f5f9;
+  padding: 20px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Linhas com mais respiro */
+.psi-table td {
+  padding: 22px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  font-size: 15px; /* Fonte maior para leitura fácil */
+  vertical-align: middle;
+}
+
+.psi-table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Badges maiores e mais chamativos */
+.badge-status {
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.status-ativo { background: #d1fae5; color: #065f46; }
+.status-inativo { background: #fee2e2; color: #991b1b; }
+
+/* Botão de editar robusto */
+.btn-gerenciar {
+  background: #6366f1; /* Roxo/Azul moderno */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  float: right;
+}
+
+.btn-gerenciar:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+</style>

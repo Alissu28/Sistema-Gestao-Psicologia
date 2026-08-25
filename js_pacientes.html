@@ -1,0 +1,687 @@
+<script>
+/**
+ * TELA LISTA DE PACIENTES - DESIGN PREMIUM COM PAGINAÇÃO E BUSCA GLOBAL
+ */
+// Variáveis de controle globais
+let pacientesGlobais = [];
+let pacientesFiltrados = []; // Nova lista auxiliar para a busca global
+let paginaAtual = 1;
+const itensPorPagina = 10;
+
+function showPacientes() {
+  const main = document.getElementById("main");
+  if (!main) return;
+
+  // Reset das variáveis ao abrir a tela
+  pacientesGlobais = [];
+  pacientesFiltrados = [];
+  paginaAtual = 1;
+
+  // 1. Cria a estrutura visual moderna com o novo cabeçalho estilizado
+  main.innerHTML = `
+    <style>
+      .dash-body { 
+        padding: 24px; 
+        width: 100%; 
+        box-sizing: border-box; 
+        background-color: #f8fafc; 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      }
+      .page-header {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .btn-primary-custom {
+        background: #8b5cf6 !important;
+        color: white !important;
+        padding: 11px 22px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        transition: all 0.2s ease;
+      }
+      .btn-primary-custom:hover {
+        background: #7c3aed !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+      }
+      .search-wrapper {
+        background: white; 
+        padding: 14px 20px; 
+        border-radius: 12px; 
+        margin-bottom: 24px; 
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); 
+        border: 1px solid #e2e8f0;
+        transition: border-color 0.2s ease;
+      }
+      .search-wrapper:focus-within {
+        border-color: #8b5cf6;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.05);
+      }
+      .search-wrapper input {
+        width: 100%; 
+        border: none; 
+        outline: none; 
+        font-size: 15px; 
+        color: #334155;
+        font-weight: 500;
+      }
+      .search-wrapper input::placeholder { color: #94a3b8; }
+      
+      /* Estilização Avançada da Tabela */
+      .psi-table-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        overflow: hidden;
+      }
+      .psi-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+      .psi-table th {
+        background: #f8fafc;
+        padding: 16px 20px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .psi-table td {
+        padding: 18px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        vertical-align: middle;
+      }
+      .psi-table tr:hover td {
+        background-color: #f8fafc;
+      }
+      
+      /* Badges de Status Personalizadas */
+      .badge-status-premium {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .status-ativo-premium { background-color: #f0fdf4; color: #10b981; }  
+      .status-alta-premium { background-color: #ecfeff; color: #06b6d4; }   
+      .status-inativo-premium { background-color: #f1f5f9; color: #64748b; }
+
+      .actions-flex {
+        display: flex; 
+        gap: 8px; 
+        justify-content: flex-end;
+      }
+      .btn-action-table {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e2e8f0;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+      }
+      .btn-action-table.edit:hover {
+        background: #f5f3ff;
+        border-color: #c084fc;
+        color: #8b5cf6;
+      }
+      .btn-action-table.delete {
+        background: #fff5f5;
+        border-color: #fee2e2;
+        color: #ef4444;
+      }
+      .btn-action-table.delete:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+      }
+
+      /* Estilo dos Controles de Paginação */
+      .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+      }
+      .pagination-info {
+        font-size: 14px;
+        color: #64748b;
+        font-weight: 500;
+      }
+      .pagination-buttons {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-page {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: white;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-page:hover:not(:disabled) {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+      }
+      .btn-page:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f1f5f9;
+      }
+    </style>
+
+    <div class="dash-body">
+      <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 50px; height: 50px; background-color: #f5f3ff; color: #8b5cf6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.15);">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div>
+            <h2 style="color: #0f172a; font-weight: 800; margin: 0; font-size: 24px; letter-spacing: -0.5px;">Meus Pacientes</h2>
+            <p style="color: #64748b; font-size: 14px; margin: 4px 0 0 0; font-weight: 500;">Gerencie o cadastro e histórico clínico da sua base ativa</p>
+          </div>
+        </div>
+
+        <button class="btn-primary-custom" onclick="abrirFormPaciente()">
+          <i class="fa-solid fa-plus"></i> Novo Paciente
+        </button>
+      </div>
+
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass" style="color: #94a3b8; font-size: 16px;"></i>
+        <input type="text" id="inputBusca" placeholder="Pesquisar paciente pelo nome..." onkeyup="filtrarPacientesLista()">
+      </div>
+
+      <div id="containerTabelaPacientes" class="psi-table-card">
+        <p style="text-align: center; padding: 60px; color: #64748b; font-weight: 500;">
+          <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px; color: #8b5cf6;"></i> Carregando sua base de dados...
+        </p>
+      </div>
+    </div>
+  `;
+
+  // 2. Busca dados sincronizados do servidor
+  google.script.run
+    .withFailureHandler(err => {
+       document.getElementById("containerTabelaPacientes").innerHTML = 
+         "<div style='color:#ef4444; padding:30px; text-align:center; font-weight:600;'>Erro ao conectar com a planilha: " + err + "</div>";
+    })
+    .withSuccessHandler(dados => {
+       pacientesGlobais = dados || [];
+       pacientesFiltrados = [...pacientesGlobais]; // Inicializa a lista filtrada com todos os dados
+       renderizarListaPaginada();
+    })
+    .listarPacientes();
+}
+
+/**
+ * FUNÇÃO DE RENDERIZAÇÃO DA TABELA BASEADA NA PÁGINA ATUAL E FILTROS
+ */
+function renderizarListaPaginada() {
+  const container = document.getElementById("containerTabelaPacientes");
+  if (!container) return;
+
+  if (pacientesFiltrados.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:80px; background:white; border-radius:16px;">
+        <div style="font-size: 48px; margin-bottom: 15px; color: #cbd5e1;"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <h3 style="color:#1e293b; margin-bottom:6px; font-weight:700;">Nenhum paciente encontrado</h3>
+        <p style="color:#64748b; font-size:14px;">Tente digitar outro nome ou limpe o campo de pesquisa.</p>
+      </div>`;
+    return;
+  }
+
+  // Cálculos baseados na lista filtrada atual
+  const totalItens = pacientesFiltrados.length;
+  const totalPaginas = Math.ceil(totalItens / itensPorPagina);
+  
+  if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+  if (paginaAtual < 1) paginaAtual = 1;
+
+  const indiceInicio = (paginaAtual - 1) * itensPorPagina;
+  const indiceFim = Math.min(indiceInicio + itensPorPagina, totalItens);
+  const itensDaPagina = pacientesFiltrados.slice(indiceInicio, indiceFim);
+
+  let html = `
+    <table class="psi-table" id="tabelaDadosPacientes">
+      <thead>
+        <tr>
+          <th style="width: 35%;">Nome do Paciente</th>
+          <th style="width: 20%;">CPF</th>
+          <th style="width: 20%;">Dados Clínicos</th>
+          <th style="width: 13%;">Status</th>
+          <th style="width: 12%; text-align: right;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  itensDaPagina.forEach(p => {
+    const nome = p[1] ? p[1].toString().toUpperCase() : "---";
+    const statusRaw = (p[10] || "ATIVO").trim().toUpperCase();
+    
+    let classePremium = "status-ativo-premium";
+    if (statusRaw === "INATIVO") classePremium = "status-inativo-premium";
+    if (statusRaw === "ALTA" || statusRaw === "DE ALTA") classePremium = "status-alta-premium";
+
+    html += `
+      <tr>
+        <td>
+          <div style="font-weight: 700; color: #0f172a; font-size: 15px;">${nome}</div>
+        </td>
+        <td>
+          <div style="font-weight: 600; color: #64748b; font-size: 14px;">${p[3] || '---'}</div>
+        </td>
+        <td>
+          <div style="margin-bottom: 4px; font-size:14px; color:#334155;"><i class="fa-regular fa-calendar" style="color:#94a3b8; margin-right:4px;"></i> <b>${p[6] || '---'}</b></div>
+          <div style="font-size: 12px; color: #94a3b8; font-weight:500;"><i class="fa-regular fa-user" style="margin-right:4px;"></i> ${p[7] || '---'}</div>
+        </td>
+        <td>
+          <span class="badge-status-premium ${classePremium}">${statusRaw}</span>
+        </td>
+        <td style="text-align: right;">
+          <div class="actions-flex">
+            <button class="btn-action-table edit" title="Editar Informações" onclick="editarPaciente('${p[0]}')">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button class="btn-action-table delete" title="Excluir Paciente" onclick="deletarPaciente('${p[0]}', '${nome}')">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </td>
+      </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  // Só renderiza a barra de paginação se houver mais de uma página de resultados
+  if (totalPaginas > 1) {
+    html += `
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Mostrando <b>${indiceInicio + 1}</b> a <b>${indiceFim}</b> de <b>${totalItens}</b> pacientes
+        </div>
+        <div class="pagination-buttons">
+          <button class="btn-page" id="btnPagAnt" onclick="mudarPagina(-1)" ${paginaAtual === 1 ? 'disabled' : ''}>
+            <i class="fa-solid fa-chevron-left"></i> Anterior
+          </button>
+          <div style="display:flex; align-items:center; padding: 0 10px; font-size:14px; font-weight:700; color:#475569;">
+            Página ${paginaAtual} de ${totalPaginas}
+          </div>
+          <button class="btn-page" id="btnPagProx" onclick="mudarPagina(1)" ${paginaAtual === totalPaginas ? 'disabled' : ''}>
+            Próximo <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  } else if (totalItens > 0 && totalItens < pacientesGlobais.length) {
+    // Caso especial: mostrando resultados filtrados em uma única página curta
+    html += `
+      <div class="pagination-container">
+        <div class="pagination-info">
+          Encontrado(s) <b>${totalItens}</b> registro(s) correspondente(s) à busca.
+        </div>
+      </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+/**
+ * NAVEGAÇÃO ENTRE PÁGINAS
+ */
+function mudarPagina(direcao) {
+  paginaAtual += direcao;
+  renderizarListaPaginada();
+}
+
+/**
+ * NOVO FILTRO GLOBAL INTEGRADO (BUSCA EM TODAS AS PÁGINAS)
+ */
+function filtrarPacientesLista() {
+  const input = document.getElementById("inputBusca");
+  if (!input) return;
+  
+  const termoBusca = input.value.toUpperCase().trim();
+  
+  if (termoBusca === "") {
+    // Se a busca estiver vazia, restaura a lista padrão e mantém a página 1
+    pacientesFiltrados = [...pacientesGlobais];
+  } else {
+    // Filtra a lista completa de pacientes (independente de onde eles estejam na paginação)
+    pacientesFiltrados = pacientesGlobais.filter(p => {
+      const nomePaciente = p[1] ? p[1].toString().toUpperCase() : "";
+      return nomePaciente.indexOf(termoBusca) > -1;
+    });
+  }
+  
+  // Reseta sempre para a primeira página ao buscar para evitar telas vazias
+  paginaAtual = 1;
+  renderizarListaPaginada();
+}
+
+/**
+ * CARREGA REGISTRO E CHAMA FORMULÁRIO EM MODO DE EDIÇÃO
+ */
+function editarPaciente(id) {
+  google.script.run
+    .withSuccessHandler(function(paciente) {
+      if (!paciente) {
+        alert("⚠️ Erro: Registro do paciente não pôde ser localizado!");
+        return;
+      }
+
+      abrirFormPaciente();
+
+      setTimeout(function() {
+        document.getElementById("p_id").value = paciente.id || "";
+        document.getElementById("p_nome").value = paciente.nome || "";
+        document.getElementById("p_responsavel").value = paciente.responsavel || "";
+        document.getElementById("p_nascimento").value = paciente.nascimento || "";
+        document.getElementById("p_sexo").value = paciente.sexo || "Masculino";
+        document.getElementById("p_cpf").value = paciente.cpf || "";
+        document.getElementById("p_rg").value = paciente.rg || "";
+        document.getElementById("p_telefone").value = paciente.telefone || "";
+        document.getElementById("p_endereco").value = paciente.endereco || "";
+        document.getElementById("p_valor").value = paciente.valorSessao || "";
+        document.getElementById("p_status").value = paciente.status || "Ativo";
+        
+        const headerTitle = document.querySelector(".cadastro-header");
+        if(headerTitle) headerTitle.innerHTML = "<i class='fa-solid fa-user-pen' style='color:#8b5cf6;'></i> Atualizar Cadastro do Paciente";
+
+        const btn = document.querySelector(".btn-cadastrar-submit");
+        if(btn) btn.innerHTML = "<i class='fa-solid fa-floppy-disk'></i> ATUALIZAR REGISTRO";
+      }, 150); 
+    })
+    .getPacientePorId(id);
+}
+
+/**
+ * FORMULÁRIO DE CADASTRO/EDIÇÃO ESTILIZADO E LIMPO
+ */
+function abrirFormPaciente(p = {}) {
+  document.getElementById("main").innerHTML = `
+  <style>
+    .cadastro-container {
+      background-color: #f8fafc;
+      padding: 24px;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    .cadastro-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+    .cadastro-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .cadastro-body {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-group label span { color: #ef4444; }
+    
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #334155;
+      background-color: #fff;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+      outline: none;
+    }
+    .cadastro-footer {
+      padding: 20px 30px;
+      background: #f8fafc;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+    }
+    .btn-footer-nav {
+      padding: 10px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-footer-nav.back {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+    .btn-footer-nav.back:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .btn-footer-nav.save {
+      background: #8b5cf6;
+      border: none;
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+    }
+    .btn-footer-nav.save:hover {
+      background: #7c3aed;
+      transform: translateY(-1px);
+    }
+  </style>
+
+  <div class="cadastro-container">
+    <div style="margin-bottom: 16px; font-size: 13px; color: #64748b; font-weight: 500;">
+      Início / Pacientes / <b style="color:#0f172a;">Cadastrar</b>
+    </div>
+    
+    <div class="cadastro-card">
+      <div class="cadastro-header"><i class="fa-solid fa-user-plus" style="color:#8b5cf6;"></i> Ficha de Cadastro Clínico</div>
+      
+      <div class="cadastro-body">
+        <input type="hidden" id="p_id" value="${p.id || ""}">
+        
+        <div class="form-group">
+          <label>Nome do paciente <span>*</span></label>
+          <input id="p_nome" value="${p.nome || ""}" placeholder="Nome completo do paciente">
+        </div>
+        
+        <div class="form-group">
+          <label>Responsável Legal</label>
+          <input id="p_responsavel" value="${p.responsavel || ""}" placeholder="Nome do pai, mãe ou tutor (se menor)">
+        </div>
+
+        <div class="form-group">
+          <label>Data de Nascimento <span>*</span></label>
+          <input id="p_nascimento" type="date" value="${p.nascimento || ""}">
+        </div>
+
+        <div class="form-group">
+          <label>Sexo Biológico</label>
+          <select id="p_sexo">
+            <option value="Feminino" ${p.sexo=="Feminino"?"selected":""}>Feminino</option>
+            <option value="Masculino" ${p.sexo=="Masculino"?"selected":""}>Masculino</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Documento (CPF) <span>*</span></label>
+          <input id="p_cpf" value="${p.cpf || ""}" placeholder="000.000.000-00">
+        </div>
+
+        <div class="form-group">
+          <label>RG</label> 
+          <input id="p_rg" value="${p.rg || ""}" placeholder="RG do Paciente">
+        </div>
+
+        <div class="form-group">
+          <label>Telefone / WhatsApp <span>*</span></label>
+          <input id="p_telefone" value="${p.telefone || ""}" placeholder="(00) 00000-0000">
+        </div>
+        
+        <div class="form-group">
+          <label>Valor da Sessão (R$)</label>
+          <input id="p_valor" type="number" step="0.01" value="${p.valorSessao || ""}" placeholder="0.00">
+        </div>
+        
+        <div class="form-group">
+          <label>Status Clínico</label>
+          <select id="p_status">
+            <option value="Ativo" ${p.status=="Ativo"?"selected":""}>Ativo</option>
+            <option value="Alta" ${p.status=="Alta"?"selected":""}>Alta</option>
+            <option value="Inativo" ${p.status=="Inativo"?"selected":""}>Inativo</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label>Endereço Residencial Completo <span>*</span></label>
+          <textarea id="p_endereco" style="height: 70px; resize: vertical;" placeholder="Rua, Número, Bairro, Cidade - UF">${p.endereco || ""}</textarea>
+        </div>
+      </div>
+      
+      <div class="cadastro-footer">
+        <button class="btn-footer-nav back" onclick="showPacientes()"><i class="fa-solid fa-arrow-left"></i> Voltar à Lista</button>
+        <button class="btn-footer-nav save btn-cadastrar-submit" onclick="salvarPaciente()"><i class="fa-solid fa-floppy-disk"></i> GRAVAR DADOS</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/**
+ * CAPTURA FORMULÁRIO E SALVA COM FEEDBACK VISUAL PREMIUM
+ */
+function salvarPaciente() {
+  const btn = document.querySelector(".btn-cadastrar-submit");
+
+  const d = {
+    id: document.getElementById("p_id").value,
+    nome: document.getElementById("p_nome").value,
+    responsavel: document.getElementById("p_responsavel").value, 
+    nascimento: document.getElementById("p_nascimento").value,
+    sexo: document.getElementById("p_sexo").value,
+    cpf: document.getElementById("p_cpf").value,
+    rg: document.getElementById("p_rg").value,
+    telefone: document.getElementById("p_telefone").value,
+    email: "", 
+    endereco: document.getElementById("p_endereco").value,
+    valor: document.getElementById("p_valor").value,
+    status: document.getElementById("p_status") ? document.getElementById("p_status").value : "Ativo",
+    obs: "" 
+  };
+
+  if(!d.nome) {
+    alert("⚠️ O campo Nome do Paciente é obrigatório para o registro!");
+    return;
+  }
+
+  if(btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Salvando...";
+  }
+
+  google.script.run
+    .withSuccessHandler(res => {
+      if(res.sucesso) {
+        alert("✅ Prontuário do paciente updated/saved com sucesso!");
+        if (typeof showPacientes === 'function') showPacientes();
+      } else {
+        alert("❌ Falha na gravação: " + res.erro);
+        if(btn) {
+          btn.disabled = false;
+          btn.innerHTML = "<i class='fa-solid fa-floppy-disk'></i> GRAVAR DADOS";
+        }
+      }
+    })
+    .withFailureHandler(err => {
+      alert("❌ Falha crítica de rede: " + err);
+      if(btn) {
+        btn.disabled = false;
+        btn.innerHTML = "<i class='fa-solid fa-floppy-disk'></i> GRAVAR DADOS";
+      }
+    })
+    .salvarNovoPaciente(d); 
+}
+
+function deletarPaciente(id, nome) {
+  if (!confirm("⚠️ CONFIRMAÇÃO EXIGIDA:\n\nDeseja realmente excluir permanentemente o cadastro e histórico do(a) paciente " + nome + "? Esta ação não poderá ser desfeita.")) {
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(res => {
+      if(res.sucesso) {
+        alert("🗑️ Registro do paciente excluído do ecossistema!");
+        if (typeof showPacientes === 'function') showPacientes();
+      } else {
+        alert("❌ Falha ao tentar excluir: " + res.erro);
+      }
+    })
+    .withFailureHandler(err => {
+      alert("❌ Falha na comunicação técnica: " + err);
+    })
+    .excluirPacienteSistema(id, nome);
+}
+</script>

@@ -1,0 +1,436 @@
+<style>
+  /* JORNADA E COCKPIT PREMIUM - ESTILOS GERAIS */
+  .sessao-grid-layout {
+    display: grid !important; 
+    grid-template-columns: 380px 1fr !important; 
+    gap: 24px !important; 
+    height: 92vh !important; 
+    padding: 24px !important; 
+    background-color: #f8fafc !important;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    box-sizing: border-box !important;
+    animation: sessaoFadeIn 0.25s ease-out;
+  }
+
+  /* BARRA LATERAL: JORNADA DO PACIENTE */
+  .sidebar-jornada {
+    background: white !important; 
+    border-radius: 16px !important; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02) !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    overflow: hidden !important; 
+    border: 1px solid #e2e8f0 !important;
+  }
+  .sidebar-jornada-header {
+    padding: 24px !important; 
+    background: linear-gradient(135deg, #0f172a, #1e293b) !important; 
+    color: white !important;
+  }
+  .sidebar-jornada-timeline {
+    flex: 1 !important;
+    overflow-y: auto !important; 
+    padding: 20px !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    gap: 14px !important; 
+    background: #fafafa !important;
+  }
+
+  /* CARTÕES DA LINHA DO TEMPO */
+  .timeline-card-mini {
+    background: white !important; 
+    padding: 16px !important; 
+    border-radius: 12px !important; 
+    border: 1px solid #e2e8f0 !important;
+    border-left: 4px solid #10b981 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ÁREA DE REGISTRO DIREITA */
+  .area-registro-clinico {
+    display: flex !important;
+    flex-direction: column !important; 
+    gap: 20px !important; 
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  /* VISOR DO CRONÔMETRO */
+  .cronometro-panel {
+    font-family: 'Courier New', Courier, monospace !important; 
+    font-size: 26px !important;
+    font-weight: 800 !important; 
+    color: #059669 !important; 
+    background: #ecfdf5 !important; 
+    padding: 6px 20px !important; 
+    border-radius: 10px !important;
+    border: 1px solid rgba(16, 185, 129, 0.25) !important;
+    letter-spacing: 1px !important;
+  }
+
+  /* ENTRADAS DE DADOS E SELECTS */
+  .input-field-sessao {
+    width: 100% !important;
+    padding: 11px 14px !important; 
+    border: 1px solid #cbd5e1 !important; 
+    border-radius: 8px !important; 
+    font-size: 13px !important; 
+    color: #334155 !important;
+    background-color: #fff !important;
+    transition: all 0.2s !important;
+    font-weight: 500 !important;
+    box-sizing: border-box !important;
+  }
+  .input-field-sessao:focus { 
+    border-color: #8b5cf6 !important; 
+    outline: none !important; 
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important; 
+  }
+  
+  .select-sessao-secure {
+    cursor: pointer !important;
+    padding-right: 24px !important;
+  }
+
+  /* BOTÕES E RELATO TEXTAREA */
+  .textarea-evolucao-sessao {
+    flex: 1 !important;
+    width: 100% !important;
+    padding: 20px !important; 
+    border-radius: 12px !important; 
+    border: 1px solid #cbd5e1 !important; 
+    font-size: 14px !important;
+    color: #334155 !important;
+    line-height: 1.6 !important;
+    resize: none !important;
+    font-family: inherit !important;
+    box-sizing: border-box !important;
+  }
+  .textarea-evolucao-sessao:focus {
+    border-color: #8b5cf6 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+  }
+
+  .btn-sessao-main {
+    background: #10b981 !important;
+    color: white !important;
+    border: none !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
+    transition: all 0.2s ease !important;
+  }
+  .btn-sessao-main:hover {
+    background: #059669 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25) !important;
+  }
+  .btn-sessao-main:disabled {
+    background: #cbd5e1 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+  }
+
+  .btn-cronometro-trigger {
+    background: #1e293b !important;
+    color: white !important;
+    border: none !important;
+    padding: 0 20px !important;
+    height: 42px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s !important;
+  }
+  .btn-cronometro-trigger:hover {
+    background: #0f172a !important;
+  }
+
+  @keyframes sessaoFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+/**
+ * VARIÁVEIS GLOBAIS PRESERVADAS IPREMEDITADAMENTE
+ */
+let intervaloCronometro = null;
+let tempoAcumulado = 0; 
+let horaInicio = null; 
+
+/**
+ * TELA UNIFICADA: COCKPIT DO TERAPEUTA PREMIUM
+ */
+function showSessoes() {
+  // Limpa cronômetros anteriores para evitar vazamento de memória ou duplicidade
+  if (intervaloCronometro) {
+    clearInterval(intervaloCronometro);
+    intervaloCronometro = null;
+  }
+  tempoSegundos = 0;
+
+  const main = document.getElementById("main");
+  if (!main) return;
+
+  main.innerHTML = `
+    <div class="sessao-grid-layout">
+      
+      <div class="sidebar-jornada">
+        <div class="sidebar-jornada-header">
+          <h3 style="margin:0; font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 10px; letter-spacing:-0.3px;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: #8b5cf6;"></i> Jornada do Paciente
+          </h3>
+          <div style="margin-top: 20px;">
+            <label style="font-size: 10px; font-weight: 800; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px;">Paciente em Atendimento</label>
+            <select id="ss_paciente" onchange="carregarJornada()" class="input-field-sessao select-sessao-secure" style="margin-top: 6px;">
+               <option value="">Buscando agendados...</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="ss_timeline" class="sidebar-jornada-timeline">
+           <div style="text-align: center; color: #94a3b8; margin-top: 60px; padding: 0 20px;">
+             <i class="fa-solid fa-user-doctor" style="font-size: 28px; color: #e2e8f0; margin-bottom: 12px; display:block;"></i>
+             <p style="font-size: 13px; font-weight: 500; line-height: 1.5; color:#64748b;">Selecione um paciente da lista para liberar o cockpit de atendimento.</p>
+           </div>
+        </div>
+      </div>
+
+      <div id="ss_area_registro" class="area-registro-clinico" style="opacity: 0.3; pointer-events: none; filter: grayscale(1);">
+        
+        <div style="background: white; padding: 20px 28px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border: 1px solid #e2e8f0;">
+          <h2 id="ss_nome_paciente_label" style="margin:0; color: #0f172a; font-weight: 800; font-size: 18px; letter-spacing: -0.3px;">Atendimento Ativo</h2>
+          <div style="display: flex; align-items: center; gap: 12px;">
+             <div id="cronometroBox" class="cronometro-panel">00:00:00</div>
+             <button onclick="toggleCronometro()" id="btnCron" class="btn-cronometro-trigger">
+               <i class="fa-solid fa-play"></i> Iniciar
+             </button>
+          </div>
+        </div>
+
+        <div style="background: white; flex: 1; border-radius: 16px; padding: 28px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 20px; border: 1px solid #e2e8f0;">
+          
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 16px;">
+              <div>
+                <label style="display:block; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; letter-spacing:0.5px;">🎭 Humor do Paciente</label>
+                <select id="ss_humor" class="input-field-sessao select-sessao-secure">
+                  <option value="Estável">😊 Estável</option>
+                  <option value="Ansioso">😟 Ansioso</option>
+                  <option value="Depressivo">😢 Triste</option>
+                  <option value="Irritável">😠 Irritado</option>
+                </select>
+              </div>
+              <div>
+                <label style="display:block; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; letter-spacing:0.5px;">🎯 Queixa / Tema Central</label>
+                <input type="text" id="ss_tema" placeholder="Tema ou foco principal da sessão..." class="input-field-sessao">
+              </div>
+              <div>
+                <label style="display:block; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 6px; letter-spacing:0.5px;">📊 Status da Consulta</label>
+                <select id="ss_status" class="input-field-sessao select-sessao-secure" style="font-weight: 700; color: #10b981;">
+                  <option value="Realizada" style="color: #10b981;">Realizada</option>
+                  <option value="Falta" style="color: #ef4444;">Faltou</option>
+                  <option value="Cancelada" style="color: #64748b;">Cancelada</option>
+                </select>
+              </div>
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing:0.5px;">📝 Registro da Evolução Clínica</label>
+            <textarea id="ss_evolucao" class="textarea-evolucao-sessao" placeholder="Redija detalhadamente as percepções, técnicas aplicadas e o andamento clínico do paciente..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 4px;">
+            <button onclick="finalizarSessao(this)" class="btn-sessao-main" style="flex: 2;">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar e Concluir Prontuário
+            </button>
+            <button onclick="showDashboard()" class="btn-sessao-main" style="flex: 1; background: #e2e8f0 !important; color: #475569 !important; box-shadow: none !important;">
+              Sair sem salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Consulta servidores do ecossistema Google Apps Script
+  google.script.run.withSuccessHandler(pacientes => {
+    let opt = '<option value="">Quem vamos atender hoje?</option>';
+    if (pacientes && pacientes.length > 0) {
+      pacientes.forEach(nome => {
+        opt += `<option value="${nome}">${nome.toUpperCase()}</option>`;
+      });
+    } else {
+      opt = '<option value="">📅 Sem agendamentos para hoje</option>';
+    }
+    document.getElementById("ss_paciente").innerHTML = opt;
+  }).listarAgendadosHoje();
+}
+
+/**
+ * CARREGA A JORNADA RETROATIVA E ATIVA O PAINEL DE COMANDOS
+ */
+function carregarJornada() {
+  const pac = document.getElementById("ss_paciente").value;
+  const area = document.getElementById("ss_area_registro");
+  const timeline = document.getElementById("ss_timeline");
+
+  if (!pac) {
+    area.style.opacity = "0.3";
+    area.style.pointerEvents = "none";
+    area.style.filter = "grayscale(1)";
+    return;
+  }
+
+  area.style.opacity = "1";
+  area.style.pointerEvents = "auto";
+  area.style.filter = "grayscale(0)";
+  document.getElementById("ss_nome_paciente_label").innerHTML = `<i class="fa-solid fa-user" style="color:#8b5cf6; margin-right:6px;"></i> Sessão Ativa: ${pac.toUpperCase()}`;
+  
+  timeline.innerHTML = `
+    <div style="text-align:center; padding: 40px 0; color:#64748b;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="color:#8b5cf6; font-size:18px; margin-bottom:8px;"></i><br>
+      Montando linha do tempo...
+    </div>`;
+
+  google.script.run.withSuccessHandler(hist => {
+    if (!hist || hist.length === 0) {
+      timeline.innerHTML = `
+        <div style='text-align:center; padding: 40px 10px; color:#94a3b8; font-weight:500; font-size:13px;'>
+          <i class="fa-solid fa-sparkles" style="color:#e2e8f0; font-size:24px; margin-bottom:8px; display:block;"></i>
+          Primeira sessão deste paciente no sistema.
+        </div>`;
+      return;
+    }
+    timeline.innerHTML = hist.map(h => `
+      <div class="timeline-card-mini">
+        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px;">
+          <b style="color: #64748b;"><i class="fa-regular fa-calendar"></i> ${h.data}</b>
+          <span style="color: #10b981; font-weight: 700; background:#f0fdf4; padding:2px 8px; border-radius:10px;">${h.humor || "Estável"}</span>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: #334155; line-height:1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-weight:500;">${h.evolucao || ""}</p>
+      </div>
+    `).join("");
+  }).buscarHistoricoProntuario(pac);
+}
+
+/**
+ * ENGENHARIA DO CRONÔMETRO DE PRECISÃO REAL MILISSEGUNDO
+ */
+function toggleCronometro() {
+  const btn = document.getElementById("btnCron");
+  if (!btn) return;
+  
+  if (intervaloCronometro) {
+    // ---- INTERRUPÇÃO / PAUSA ----
+    clearInterval(intervaloCronometro);
+    intervaloCronometro = null;
+    
+    tempoAcumulado += Date.now() - horaInicio;
+    btn.innerHTML = '<i class="fa-solid fa-play"></i> Continuar';
+    btn.style.background = "#1e293b";
+  } else {
+    // ---- INÍCIO / EXECUÇÃO ----
+    horaInicio = Date.now();
+    
+    intervaloCronometro = setInterval(() => {
+      const tempoTotalMilissegundos = (Date.now() - horaInicio) + tempoAcumulado;
+      const totalSegundos = Math.floor(tempoTotalMilissegundos / 1000);
+      
+      const h = Math.floor(totalSegundos / 3600).toString().padStart(2, '0');
+      const m = Math.floor((totalSegundos % 3600) / 60).toString().padStart(2, '0');
+      const s = (totalSegundos % 60).toString().padStart(2, '0');
+      
+      document.getElementById("cronometroBox").innerText = `${h}:${m}:${s}`;
+    }, 1000);
+    
+    btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pausar';
+    btn.style.background = "#ef4444";
+  }
+}
+
+/**
+ * LIMPEZA E ZERAMENTO DO CONTROLADOR DE TEMPO
+ */
+function zerarCronometro() {
+  if (intervaloCronometro) {
+    clearInterval(intervaloCronometro);
+    intervaloCronometro = null;
+  }
+  tempoAcumulado = 0;
+  horaInicio = null;
+  document.getElementById("cronometroBox").innerText = "00:00:00";
+  document.getElementById("btnCron").innerHTML = '<i class="fa-solid fa-play"></i> Iniciar';
+  document.getElementById("btnCron").style.background = "#1e293b";
+}
+
+/**
+ * COMPILAÇÃO E DISPARO LOGÍSTICO DOS DADOS CLÍNICOS
+ */
+function finalizarSessao(botao) {
+  const pac = document.getElementById("ss_paciente").value;
+  const evolucaoTexto = document.getElementById("ss_evolucao").value;
+  const humorValor = document.getElementById("ss_humor").value;
+  const temaTexto = document.getElementById("ss_tema").value;
+  const statusValor = document.getElementById("ss_status").value;
+  const duracaoTexto = document.getElementById("cronometroBox").innerText;
+
+  if (!pac || !evolucaoTexto.trim()) {
+    alert("⚠️ Atenção: Selecione o paciente ativo e redija o relato clínico antes de concluir!");
+    return;
+  }
+
+  botao.disabled = true;
+  botao.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Gravando sessão...";
+
+  const dadosSessao = {
+    paciente: pac,
+    evolucao: evolucaoTexto,
+    humor: humorValor,
+    tema: temaTexto,
+    status: statusValor,
+    duracao: duracaoTexto
+  };
+
+  console.log("Despachando dados íntegros:", dadosSessao);
+
+  google.script.run.withSuccessHandler(res => {
+    if (res.sucesso) {
+      alert("✅ Atendimento e folha de evolução consolidados com sucesso!");
+      if (intervaloCronometro) clearInterval(intervaloCronometro);
+      showDashboard(); 
+    } else {
+      alert("❌ Ocorreu um erro interno ao salvar: " + res.erro);
+      botao.disabled = false;
+      botao.innerHTML = "<i class='fa-solid fa-floppy-disk'></i> Salvar e Concluir Prontuário";
+    }
+  }).salvarNovaSessao(dadosSessao);
+}
+
+/**
+ * EMISSÃO DE TRILHA DE LOGS
+ */
+function logSessoes(acao, detalhes) {
+  google.script.run.salvarNoBancoDeLogs({
+    modulo: "SESSÕES/AGENDA",
+    acao: acao,
+    detalhes: detalhes,
+    usuario: "ADM"
+  });
+}
+</script>

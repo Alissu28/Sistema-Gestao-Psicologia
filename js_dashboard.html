@@ -1,0 +1,424 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  .dash-body { 
+    padding: 20px; 
+    width: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 30px; 
+    box-sizing: border-box; 
+    background-color: #f8fafc; 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  
+  .card-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 15px; 
+    width: 100%; 
+  }
+  
+  .card-master { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 14px; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+    border: 1px solid #e2e8f0;
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .card-master:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px -3px rgba(0,0,0,0.08);
+  }
+  
+  .card-master::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background-color: var(--border-color, #ff4db2);
+  }
+
+  .card-info { display: flex; flex-direction: column; }
+  .card-info h3 { margin: 0; font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+  .card-info .valor { font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 6px; }
+  
+  .card-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background-color: var(--bg-icon, #fdf2f8);
+    color: var(--border-color, #ff4db2);
+  }
+  
+  .row-flex { 
+    display: grid; 
+    grid-template-columns: 2.5fr 1fr; 
+    gap: 25px; 
+    width: 100%; 
+  }
+  
+  .col-grafico, .col-niver { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 18px; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); 
+    border: 1px solid #e2e8f0; 
+  }
+  
+  /* Topo do gráfico modificado para alinhar Título e Filtros */
+  .grafico-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .list-title { 
+    font-weight: 700; 
+    color: #0f172a; 
+    font-size: 16px; 
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+  }
+  
+  /* Grupo de botões de filtro em formato de pílula chique */
+  .filter-group {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 30px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filter-btn:hover {
+    color: #0f172a;
+  }
+
+  .filter-btn.active {
+    background: white;
+    color: #10b981;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  #graficoFin { width: 100% !important; height: 340px !important; }
+  
+  .niver-item {
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 12px; 
+    margin-bottom: 10px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+  }
+  .niver-nome { font-weight: 600; color: #334155; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .niver-dia { background: #fce7f3; color: #db2777; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+
+  @media (max-width: 1100px) { .row-flex { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+// Variável global temporária para guardar os dados vindos do banco
+window.dadosGraficoBrutos = null;
+
+function showDashboard() {
+  const main = document.getElementById("main");
+  if(!main) return;
+  main.style.maxWidth = "none";
+  main.style.width = "100%";
+
+  main.innerHTML = `
+    <div class="dash-body">
+      <div class="card-grid">
+        <div class="card-master" style="--border-color: #10b981; --bg-icon: #f0fdf4;">
+          <div class="card-info">
+            <h3>Faturamento (Mês)</h3>
+            <div class="valor" id="v_faturamento">R$ 0,00</div>
+          </div>
+          <div class="card-icon-box"><i class="fa-solid fa-wallet"></i></div>
+        </div>
+        
+        <div class="card-master" style="--border-color: #3b82f6; --bg-icon: #eff6ff;">
+          <div class="card-info">
+            <h3>Sessões Concluídas</h3>
+            <div class="valor" id="v_realizadas">0</div>
+          </div>
+          <div class="card-icon-box"><i class="fa-solid fa-calendar-check"></i></div>
+        </div>
+        
+        <div class="card-master" style="--border-color: #8b5cf6; --bg-icon: #f5f3ff;">
+          <div class="card-info">
+            <h3>Pacientes Ativos</h3>
+            <div class="valor" id="v_ativos">0</div>
+          </div>
+          <div class="card-icon-box"><i class="fa-solid fa-user-check"></i></div>
+        </div>
+
+        <div class="card-master" style="--border-color: #64748b; --bg-icon: #f1f5f9;">
+          <div class="card-info">
+            <h3>Inativos</h3>
+            <div class="valor" id="v_inativos">0</div>
+          </div>
+          <div class="card-icon-box"><i class="fa-solid fa-user-minus"></i></div>
+        </div>
+
+        <div class="card-master" style="--border-color: #06b6d4; --bg-icon: #ecfeff;">
+          <div class="card-info">
+            <h3>Receberam Alta</h3>
+            <div class="valor" id="v_alta">0</div>
+          </div>
+          <div class="card-icon-box"><i class="fa-solid fa-graduation-cap"></i></div>
+        </div>
+
+        <div class="card-master" style="--border-color: #ec4899; --bg-icon: #fdf2f8;">
+          <div class="card-info">
+            <h3>Agenda de Hoje</h3>
+            <div class="valor" id="v_hoje">0</div>
+          </div>
+          <div class="card-icon-box"><i class="fa-solid fa-user-clock"></i></div>
+        </div>
+      </div>
+      
+      <div class="row-flex">
+        <div class="col-grafico">
+          <div class="grafico-header">
+            <div class="list-title"><i class="fa-solid fa-chart-line" style="color: #10b981;"></i> Evolução Financeira</div>
+            <div class="filter-group">
+              <button class="filter-btn active" id="btn-ano" onclick="mudarFiltroGrafico('ano')">Ano</button>
+              <button class="filter-btn" id="btn-mes" onclick="mudarFiltroGrafico('mes')">Mês</button>
+              <button class="filter-btn" id="btn-dia" onclick="mudarFiltroGrafico('dia')">Hoje</button>
+            </div>
+          </div>
+          <div style="position: relative; width: 100%;"><canvas id="graficoFin"></canvas></div>
+        </div>
+        
+        <div class="col-niver">
+          <div class="list-title"><i class="fa-solid fa-cake-candles" style="color: #ec4899;"></i> Próximos Aniversários</div>
+          <div id="lista_niver">Carregando...</div>
+        </div>
+      </div>
+    </div>
+  `;
+  buscarDadosDash();
+}
+
+function buscarDadosDash() {
+  google.script.run
+    .withSuccessHandler(exibirPainel)
+    .getDadosDash();
+}
+
+function exibirPainel(d) {
+  if(!d || !d.cards) return;
+  document.getElementById("v_faturamento").innerText = d.cards.faturamento || "R$ 0,00";
+  document.getElementById("v_realizadas").innerText = d.cards.realizadas || "0";
+  document.getElementById("v_ativos").innerText = d.cards.ativos || "0";
+  document.getElementById("v_inativos").innerText = d.cards.inativos || "0"; 
+  document.getElementById("v_alta").innerText = d.cards.alta || "0";         
+  document.getElementById("v_hoje").innerText = d.cards.hoje || "0";
+  
+  renderizarAniversariantes(d.aniversariantes);
+  
+  if (d.grafico) {
+    window.dadosGraficoBrutos = d.grafico; // Guarda os valores para os filtros usarem
+    mudarFiltroGrafico('ano'); // Inicializa mostrando o Ano completo por padrão
+  }
+}
+
+// Lógica Inteligente de chaveamento do Filtro
+function mudarFiltroGrafico(tipo) {
+  if (!window.dadosGraficoBrutos) return;
+
+  // Gerencia a classe 'active' visual dos botões
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('btn-' + tipo).classList.add('active');
+
+  const hoje = new Date();
+  const mesAtualIdx = hoje.getMonth(); // 0 = Jan, 1 = Fev...
+  const diaAtualStr = String(hoje.getDate()).padStart(2, '0') + '/' + String(hoje.getMonth() + 1).padStart(2, '0');
+
+  let labelsFiltrados = [];
+  let valoresFiltrados = [];
+
+  if (tipo === 'ano') {
+    // Visão completa: Todos os meses cadastrados
+    labelsFiltrados = window.dadosGraficoBrutos.labels;
+    valoresFiltrados = window.dadosGraficoBrutos.valores;
+  } 
+  else if (tipo === 'mes') {
+    // Visão Mensal foca estritamente no Mês Atual isolado
+    labelsFiltrados = ["Mês Atual (" + window.dadosGraficoBrutos.labels[mesAtualIdx] + ")"];
+    valoresFiltrados = [window.dadosGraficoBrutos.valores[mesAtualIdx]];
+  } 
+  else if (tipo === 'dia') {
+    // Visão de Hoje: foca proporcionalmente no faturamento médio estimado/distribuído para o dia
+    labelsFiltrados = ["Hoje (" + diaAtualStr + ")"];
+    // Divide o valor do mês atual por 30 para dar uma estimativa real diária proporcional no gráfico
+    let valorDia = (window.dadosGraficoBrutos.valores[mesAtualIdx] / 30);
+    valoresFiltrados = [parseFloat(valorDia.toFixed(2))];
+  }
+
+  // Renderiza o gráfico atualizado de forma dinâmica
+  renderizarGrafico({ labels: labelsFiltrados, valores: valoresFiltrados });
+}
+
+function renderizarAniversariantes(lista) {
+  const div = document.getElementById("lista_niver");
+  if(!div) return;
+  if(!lista || lista.length === 0) {
+    div.innerHTML = "<p style='color:#64748b; font-size:14px; text-align:center; padding:20px;'>Nenhum aniversariante este mês.</p>";
+    return;
+  }
+  div.innerHTML = lista.map(p => `
+    <div class="niver-item">
+      <span class="niver-nome"><i class="fa-solid fa-cake-candles" style="color:#f472b6;"></i> ${p.nome}</span>
+      <span class="niver-dia">Dia ${p.dia}</span>
+    </div>
+  `).join('');
+}
+
+function renderizarGrafico(dados) {
+  const canvas = document.getElementById('graficoFin');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  if (window.meuGrafico) window.meuGrafico.destroy();
+  
+  // Criação de um degradê vertical mais sofisticado e suave
+  const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+  gradient.addColorStop(0, 'rgba(16, 185, 129, 0.22)');  // Verde sutil no topo
+  gradient.addColorStop(0.6, 'rgba(16, 185, 129, 0.04)'); // Quase invisível no meio
+  gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');    // Totalmente transparente na base
+
+  // Verifica se estamos exibindo múltiplos pontos (Ano) ou ponto único (Mês/Dia)
+  const modoPontual = dados.labels.length <= 1;
+
+  window.meuGrafico = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dados.labels,
+      datasets: [{
+        label: 'Receita',
+        data: dados.valores,
+        borderColor: '#10b981',
+        backgroundColor: gradient, 
+        fill: true,
+        tension: modoPontual ? 0 : 0.36, // Curvatura elegante apenas se houver histórico
+        borderWidth: 3.5,
+        pointBackgroundColor: '#ffffff', // Centro da bolinha branco
+        pointBorderColor: '#10b981',     // Borda verde
+        pointBorderWidth: 2.5,           // Borda mais grossa estilo "alvo"
+        pointRadius: modoPontual ? 6 : 4, // Ponto maior se for exibição única
+        pointHoverRadius: 9,             // Expansão marcante ao passar o mouse
+        pointHoverBackgroundColor: '#10b981',
+        pointHoverBorderColor: '#ffffff',
+        pointHoverBorderWidth: 2.5,
+      }]
+    },
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 15,
+          right: 15,
+          left: 5,
+          bottom: 5
+        }
+      },
+      animation: {
+        duration: 900,
+        easing: 'easeOutCubic'
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: { 
+        legend: { display: false }, 
+        tooltip: {
+          enabled: true,
+          backgroundColor: '#0f172a', // Fundo Dark premium
+          titleColor: '#94a3b8',
+          bodyColor: '#ffffff',
+          titleFont: { size: 12, weight: '600', family: 'Segoe UI' },
+          bodyFont: { size: 15, weight: '700', family: 'Segoe UI' },
+          padding: 12,
+          borderRadius: 12,
+          displayColors: false, 
+          shadowColor: 'rgba(0,0,0,0.1)',
+          shadowBlur: 10,
+          borderColor: 'rgba(255,255,255,0.08)',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
+              let value = context.parsed.y || 0;
+              return 'Faturamento: R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            }
+          }
+        }
+      },
+      scales: {
+        y: { 
+          grid: { 
+            color: '#f1f5f9',      // Linhas de grade horizontais bem discretas
+            borderDash: [6, 6],    // Estilo tracejado moderno
+            drawBorder: false      // Remove a linha sólida da borda esquerda
+          }, 
+          ticks: { 
+            color: '#94a3b8',      // Cor de texto mais suave para os valores
+            font: { size: 11, family: 'Segoe UI' },
+            padding: 10,
+            callback: function(value) {
+              // Formata o eixo com aspas de milhar limpas (Ex: R$ 2.500)
+              return 'R$ ' + value.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
+            }
+          } 
+        },
+        x: { 
+          grid: { 
+            display: false        // Sem linhas verticais para manter o design limpo
+          }, 
+          ticks: { 
+            color: '#64748b',
+            font: { size: 12, weight: '600', family: 'Segoe UI' },
+            padding: 8
+          } 
+        }
+      }
+    }
+  });
+}
+</script>

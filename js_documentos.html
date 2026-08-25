@@ -1,0 +1,38 @@
+<script>
+// FUNÇÃO PARA SALVAR NO IR E NO FLUXO DE CAIXA
+function processarRegistroFinanceiro() {
+  const btn = document.getElementById("btnGerarDoc");
+  const status = document.getElementById("statusDoc");
+
+  // Captura dos dados da tela de Gestão Financeira
+  const dados = {
+    paciente: document.getElementById("f_paciente").value,
+    cpfBeneficiario: document.getElementById("f_cpf_ben").value,
+    cpfPagador: document.getElementById("f_cpf_pag").value,
+    valor: document.getElementById("f_valor").value,
+    dataPagamento: document.getElementById("f_data_pag").value,
+    dataSessao: document.getElementById("f_data_sessao").value // Fundamental para o PDF!
+  };
+
+  if (!dados.paciente || !dados.dataSessao) {
+    alert("Erro: Paciente e Data da Sessão são obrigatórios!");
+    return;
+  }
+
+  status.innerHTML = "⏳ Gravando no Relatório Anual...";
+  btn.disabled = true;
+
+  google.script.run
+    .withSuccessHandler(res => {
+      btn.disabled = false;
+      if(res.sucesso) {
+        status.innerHTML = "✅ Registrado com sucesso!";
+        alert("Sessão movida para o Relatório Anual (IR)");
+        showFinanceiro(); // Recarrega a lista e faz a sessão sumir dos pendentes
+      } else {
+        status.innerHTML = "❌ Erro: " + res.erro;
+      }
+    })
+    .salvarRegistroFiscal(dados); // Chama a função correta no servidor.gs
+}
+</script>

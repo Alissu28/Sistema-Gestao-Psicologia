@@ -1,0 +1,520 @@
+<script>
+/**
+ * TELA AGENDA DE ATENDIMENTOS - VERSÃO COM VALIDAÇÃO ESTREITA DE CAMPOS
+ */
+function showAgenda() {
+  const main = document.getElementById("main");
+  if (!main) return;
+
+  main.innerHTML = `
+    <style>
+      .dash-body { 
+        padding: 24px; 
+        width: 100%; 
+        box-sizing: border-box; 
+        background-color: #f8fafc; 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      }
+      .page-header {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .btn-primary-custom {
+        background: #8b5cf6 !important;
+        color: white !important;
+        padding: 11px 22px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        transition: all 0.2s ease;
+      }
+      .btn-primary-custom:hover {
+        background: #7c3aed !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+      }
+      
+      .calendar-wrapper-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        padding: 24px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: auto;
+      }
+      .fc {
+        font-family: inherit;
+        min-width: 100% !important;
+      }
+      @media (max-width: 768px) {
+        .fc { min-width: 650px; }
+      }
+      .fc .fc-toolbar-title {
+        color: #0f172a !important;
+        font-size: 18px !important;
+        font-weight: 800 !important;
+        text-transform: capitalize;
+      }
+      .fc .fc-button-primary {
+        background-color: white !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        padding: 8px 14px !important;
+        border-radius: 8px !important;
+      }
+      .fc th {
+        background: #f8fafc !important;
+        padding: 10px 0 !important;
+        color: #64748b !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+      .fc td { border: 1px solid #e2e8f0 !important; }
+      .fc-event {
+        border-radius: 6px !important;
+        padding: 2px 6px !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        border: none !important;
+      }
+    </style>
+
+    <div class="dash-body">
+      <div class="page-header">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 50px; height: 50px; background-color: #f5f3ff; color: #8b5cf6; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid rgba(139, 92, 246, 0.15);">
+            <i class="fa-solid fa-calendar-days"></i>
+          </div>
+          <div>
+            <h2 style="color: #0f172a; font-weight: 800; margin: 0; font-size: 24px; letter-spacing: -0.5px;">Agenda de Atendimentos</h2>
+            <p style="color: #64748b; font-size: 14px; margin: 4px 0 0 0; font-weight: 500;">Controle horários, agendamentos clínicos e status de sessões</p>
+          </div>
+        </div>
+
+        <button class="btn-primary-custom" onclick="abrirFormSessao()">
+          <i class="fa-solid fa-plus"></i> Novo Agendamento
+        </button>
+      </div>
+
+      <div class="calendar-wrapper-card">
+        <div id="calendar"></div>
+      </div>
+    </div>
+  `;
+
+  google.script.run.withSuccessHandler(eventos => {
+    const calendarEl = document.getElementById("calendar");
+    if (!calendarEl) return;
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      locale: "pt-br",
+      height: 620,
+      events: eventos,
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      buttonText: { today: 'Hoje', month: 'Mês', week: 'Semana', day: 'Dia' },
+      dateClick: info => { abrirFormSessao({ data: info.dateStr }); },
+      eventClick: info => {
+        document.getElementById("calendar").innerHTML = `
+          <div style="text-align: center; padding: 100px; color: #64748b; font-weight: 500;">
+            <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px; color: #8b5cf6; font-size: 24px;"></i><br><br>
+            Buscando dados do agendamento...
+          </div>`;
+        
+        google.script.run
+          .withFailureHandler(erro => {
+            alert("Erro ao buscar dados: " + erro.message);
+            showAgenda();
+          })
+          .withSuccessHandler(sessao => {
+            if (!sessao) {
+              alert("Agendamento não encontrado!");
+              showAgenda();
+              return;
+            }
+            abrirFormSessao(sessao);
+          })
+          .getSessaoPorId(info.event.id);
+      }
+    });
+    calendar.render();
+  }).getSessoesCalendario();
+}
+
+/**
+ * FORMULÁRIO COM SUPORTE A ATRIBUTOS EM REGRA 'REQUIRED'
+ */
+function abrirFormSessao(d = {}) {
+  const main = document.getElementById("main");
+  if (!main) return;
+
+  main.innerHTML = `
+    <div style="padding: 24px; background-color: #f8fafc; min-height: 100vh;">
+      <div style="text-align: center; padding: 80px; color: #64748b; font-weight: 500; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
+        <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px; color: #8b5cf6; font-size: 20px;"></i> Carregando base de pacientes ativos...
+      </div>
+    </div>`;
+
+  google.script.run.withSuccessHandler(pacientes => {
+    let opts = `<option value="" data-valor="150">Selecione o paciente...</option>`;
+    
+    if (!pacientes || pacientes.length === 0) {
+      opts = `<option value="">⚠️ Nenhum paciente encontrado na planilha</option>`;
+    } else {
+      pacientes.forEach(p => {
+        const nome = p[1];
+        if (nome) {
+          let valorSessao = "150"; 
+          
+          for(let i = 2; i < p.length; i++) {
+            if(p[i] && p[i].toString().includes("R$") || (i === 9 && p[i])) {
+              valorSessao = p[i].toString().replace("R$", "").replace(".", "").replace(",", ".").trim();
+              break;
+            }
+            if(i === 9 && p[9]) {
+              valorSessao = p[9].toString().replace(",", ".");
+            }
+          }
+          
+          if(isNaN(parseFloat(valorSessao)) || parseFloat(valorSessao) <= 0) {
+            valorSessao = "150";
+          }
+
+          const sel = (d.paciente == nome) ? "selected" : "";
+          opts += `<option value="${nome}" data-valor="${valorSessao}" ${sel}>${nome.toString().toUpperCase()}</option>`;
+        }
+      });
+    }
+
+    main.innerHTML = `
+    <style>
+      .form-container-premium {
+        background-color: #f8fafc !important;
+        padding: 24px !important;
+        font-family: 'Segoe UI', Roboto, sans-serif !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        animation: fadeIn 0.25s ease-out;
+      }
+      .form-card-premium {
+        background: white !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02) !important;
+        border: 1px solid #e2e8f0 !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 auto !important;
+      }
+      .form-header-premium {
+        padding: 22px 28px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #0f172a;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .form-body-premium {
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        box-sizing: border-box;
+      }
+      .form-grid-premium {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .group-field-premium {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+        min-width: 280px;
+        box-sizing: border-box;
+      }
+      .group-field-premium.full-width {
+        width: 100%;
+        min-width: 100%;
+      }
+      .group-field-premium label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .group-field-premium label span { color: #ef4444; font-weight: bold; }
+      
+      .group-field-premium input, .group-field-premium select {
+        padding: 13px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #334155;
+        background-color: #fff;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .group-field-premium input:focus, .group-field-premium select:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        outline: none;
+      }
+      .form-footer-premium {
+        padding: 22px 32px;
+        background: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .btn-footer-premium {
+        padding: 12px 28px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        border: none;
+      }
+      @media (max-width: 640px) {
+        .form-footer-premium { flex-direction: column-reverse; }
+        .btn-footer-premium { width: 100%; }
+      }
+      .btn-footer-premium.cancel {
+        background: white;
+        border: 1px solid #cbd5e1;
+        color: #475569;
+      }
+      .btn-footer-premium.cancel:hover { background: #f1f5f9; color: #0f172a; }
+      .btn-footer-premium.save-submit {
+        background: #8b5cf6;
+        color: white;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+      }
+      .btn-footer-premium.save-submit:hover { background: #7c3aed; }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+
+    <div class="form-container-premium">
+      <div style="margin-bottom: 20px; font-size: 13px; color: #64748b; font-weight: 500; width: 100%;">
+        Início / Agenda / <b style="color:#0f172a;">${d.id ? "Editar" : "Marcar Consulta"}</b>
+      </div>
+      
+      <div class="form-card-premium">
+        <div class="form-header-premium">
+          <i class="fa-solid ${d.id ? 'fa-calendar-check' : 'fa-calendar-plus'}" style="color:#8b5cf6; font-size: 18px;"></i> 
+          ${d.id ? "Atualizar Dados da Sessão" : "Marcação de Nova Consulta"}
+        </div>
+        
+        <div class="form-body-premium">
+          <input type="hidden" id="s_id" value="${d.id || ""}">
+          
+          <div class="group-field-premium full-width">
+            <label>Paciente Vinculado <span>*</span></label>
+            <select id="s_paciente" onchange="atualizarValorPorPaciente()" onclick="atualizarValorPorPaciente()" required>
+              ${opts}
+            </select>
+          </div>
+
+          <div class="form-grid-premium">
+            <div class="group-field-premium">
+              <label>Data da Sessão <span>*</span></label>
+              <!-- Forçado atributo required direto na tag -->
+              <input type="date" id="s_data" value="${d.data || ""}" required>
+            </div>
+            
+            <div class="group-field-premium">
+              <label>Horário <span>*</span></label>
+              <!-- Forçado atributo required direto na tag -->
+              <input type="time" id="s_hora" value="${d.hora || ""}" required>
+            </div>
+          </div>
+
+          <div class="form-grid-premium">
+            <div class="group-field-premium">
+              <label>Status do Agendamento</label>
+              <select id="s_status">
+                <option value="Agendado" ${d.status=="Agendado"?"selected":""}>🗓️ Agendado</option>
+                <option value="Realizada" ${d.status=="Realizada"?"selected":""}>✅ Realizada</option>
+                <option value="Cancelado" ${d.status=="Cancelado"?"selected":""}>❌ Cancelado</option>
+              </select>
+            </div>
+            
+            <div class="group-field-premium">
+              <label>Valor do Atendimento (R$)</label>
+              <input type="number" id="s_valor" step="0.01" value="${d.valor || "150.00"}" placeholder="0.00">
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-footer-premium">
+          <button class="btn-footer-premium cancel" onclick="showAgenda()"><i class="fa-solid fa-arrow-left"></i> Voltar à Agenda</button>
+          <button class="btn-footer-premium save-submit" onclick="salvarSessao()"><i class="fa-solid fa-floppy-disk"></i> CONFIRMAR AGENDAMENTO</button>
+        </div>
+      </div>
+    </div>`;
+    
+    setTimeout(atualizarValorPorPaciente, 100);
+  }).listarPacientes();
+}
+
+/**
+ * CAPTURA DINÂMICA COMPLETA DO VALOR
+ */
+function atualizarValorPorPaciente() {
+  const selectPaciente = document.getElementById("s_paciente");
+  const inputValor = document.getElementById("s_valor");
+  
+  if (!selectPaciente || !inputValor) return;
+  
+  const opcaoSelecionada = selectPaciente.options[selectPaciente.selectedIndex];
+  if (!opcaoSelecionada) return;
+
+  const valorDoPaciente = opcaoSelecionada.getAttribute("data-valor");
+  
+  if (valorDoPaciente && valorDoPaciente !== "") {
+    inputValor.value = parseFloat(valorDoPaciente).toFixed(2);
+  }
+}
+
+/**
+ * SALVA OS DADOS COM VALIDAÇÃO TRIPLICE REFORÇADA E REMOÇÃO DE ESPAÇOS EM BRANCO
+ */
+function salvarSessao() {
+  const btn = document.querySelector(".btn-footer-premium.save-submit");
+  
+  // Captura limpando espaços em branco residuais para evitar burlar a validação
+  const pacienteVal = document.getElementById("s_paciente").value.trim();
+  const dataVal = document.getElementById("s_data").value.trim();
+  const horaVal = document.getElementById("s_hora").value.trim();
+  const statusVal = document.getElementById("s_status").value;
+  const valorVal = document.getElementById("s_valor").value;
+  const idVal = document.getElementById("s_id").value;
+
+  // Verificação matemática e de texto restrita
+  if (!pacienteVal || pacienteVal === "") {
+    alert("⚠️ Escolha um Paciente para a consulta!");
+    document.getElementById("s_paciente").focus();
+    return;
+  }
+  
+  if (!dataVal || dataVal === undefined || dataVal.length < 5) {
+    alert("⚠️ Defina a Data da sessão!");
+    document.getElementById("s_data").focus();
+    return;
+  }
+  
+  if (!horaVal || horaVal === undefined || horaVal.length < 3) {
+    alert("⚠️ Defina o Horário do atendimento!");
+    document.getElementById("s_hora").focus();
+    return;
+  }
+
+  const d = {
+    id: idVal,
+    paciente: pacienteVal,
+    data: dataVal,
+    hora: horaVal,
+    status: statusVal,
+    valor: valorVal,
+    tipo: "Consulta",
+    pago: "Pendente"
+  };
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<i class='fa-solid fa-circle-notch fa-spin'></i> Gravando Agendamento...";
+  }
+
+  google.script.run
+    .withSuccessHandler(() => {
+      alert("✅ Agendamento salvo com sucesso no ecossistema!");
+      showAgenda();
+    })
+    .withFailureHandler(err => {
+      alert("❌ Falha técnica ao salvar agendamento: " + err);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = "<i class='fa-solid fa-floppy-disk'></i> CONFIRMAR AGENDAMENTO";
+      }
+    })
+    .salvarSessaoCompleta(d);
+}
+
+function salvarEvolucao(nomePaciente) {
+  const cronoEl = document.getElementById("cronometroBox");
+  const tempoFinal = cronoEl ? cronoEl.innerText : "50:00"; 
+  
+  const temaEl = document.getElementById("sessao_tema");
+  const evolEl = document.getElementById("sessao_evolucao");
+
+  const dados = {
+    paciente: nomePaciente,
+    tema: temaEl ? temaEl.value : "Sessão Geral",
+    evolucao: evolEl ? evolEl.value : "",
+    duracao: tempoFinal
+  };
+
+  if (!dados.evolucao) {
+    alert("⚠️ Preencha a evolução!");
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(() => {
+        alert("✅ Salvo!");
+        showAgenda();
+    })
+    .salvarProntuario(dados);
+}
+
+function logSessoes(acao, detalhes) {
+  google.script.run.salvarNoBancoDeLogs({
+    modulo: "SESSÕES/AGENDA",
+    acao: acao,
+    detalhes: detalhes,
+    usuario: "ADM"
+  });
+}
+</script>
